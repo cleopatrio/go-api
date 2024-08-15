@@ -1,0 +1,1 @@
+docker-compose -p dda-setup-api -f ./build/docker-compose.yml down --volumes
