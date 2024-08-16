@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Notes API Resources.
+
+Parameters:
+  # ==================================================================================================
+  #   Stack Config
+  # ==================================================================================================
+  Versao:
+    Type: String
+    Default: v1
+
+  # ==================================================================================================
+  #   Tags Config
+  # ==================================================================================================
+  Env:
+    Type: String
+    AllowedValues:
+      - localstack
+    Default: localstack
+
+  Service:
+    Type: String
+    Default: notes
+
+  Application:
+    Type: String
+    Default: notes-api
+
+  # ==================================================================================================
+  #   SQS Config
+  # ==================================================================================================
+  NewNotesQueueName:
+    Type: String
+    Default: newNoteQueue
+
+  MessageRetentionPeriod:
+    Type: String
+    Default: 1209600
+
+  ReceiveMessageWaitTimeSeconds:
+    Type: String
+    Default: 0
+
+  VisibilityTimeout:
+    Type: String
+    Default: 900
+
+Resources:
+  # ==================================================================================================
+  #   SQS Queues
+  # ==================================================================================================
+  NewNotesQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: !Ref MessageRetentionPeriod
+      ReceiveMessageWaitTimeSeconds: !Ref ReceiveMessageWaitTimeSeconds
+      VisibilityTimeout: !Ref VisibilityTimeout
+      QueueName: !Ref NewNotesQueueName
+      Tags:
+        - Key: env
+          Value: !Ref Env
+        - Key: service
+          Value: !Ref Service
+        - Key: stack
+          Value: !Sub ${AWS::StackName}
+        - Key: application
+          Value: !Ref Application
+        - Key: version
+          Value: !Ref Versao
+        - Key: resource
+          Value: sqs

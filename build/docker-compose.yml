@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  redis:
+    container_name: redis
+    image: redis:7.4.0
+    command: redis-server
+    ports:
+      - "6382:6379"
+
+  postgres:
+    container_name: postgres
+    image: postgres:16
+    environment:
+      POSTGRES_DB: notes
+      POSTGRES_USER: notes_user
+      POSTGRES_PASSWORD: notes_pass
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+    ports:
+      - "5442:5432"
+
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:3.6.0
+    ports:
+      - '4566-4597:4566-4597'
+    environment:
+      - SERVICES=iam,cloudformation,sqs
+      - DEBUG=1
+    volumes:
+      - ./scripts/localstack:/docker-entrypoint-initaws.d
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  awscli:
+    container_name: awscli
+    image: amazon/aws-cli:2.17.21
+    volumes:
+      - ./scripts/localstack:/init-scripts/localstack
+      - ./scripts/cloudformation:/init-scripts/cloudformation
+      - ./cloudformation:/cloudformation
+    entrypoint: >
+      sh -c "sh /init-scripts/localstack/01-profile-creation.sh && 
+      sh /init-scripts/cloudformation/01-wait-for-localstack.sh && 
+      sh /init-scripts/cloudformation/02-resources-creation.sh"
