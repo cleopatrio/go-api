@@ -54,17 +54,16 @@ func (r Router) Route(app *fiber.App) {
 		return responseParser(c, res, status, err)
 	})
 
-	groupV1.Get("/users/:id/notes/:note_name", func(c fiber.Ctx) error {
+	groupV1.Get("/users/:id/notes/:note_id", func(c fiber.Ctx) error {
 		userId := c.Params("id")
-		noteName := c.Params("note_name")
-		res, status, err := r.controller.GetNote(c.Context(), userId, noteName)
+		noteId := c.Params("note_id")
+		res, status, err := r.controller.GetNote(c.Context(), userId, noteId)
 		return responseParser(c, res, status, err)
 	})
 
-	groupV1.Post("/users/:id/notes/:note_name", func(c fiber.Ctx) error {
+	groupV1.Post("/users/:id/notes", func(c fiber.Ctx) error {
 		userId := c.Params("id")
-		noteName := c.Params("note_name")
-		res, status, err := r.controller.CreateNote(c.Context(), userId, noteName)
+		res, status, err := r.controller.CreateNote(c.Context(), userId, c.Body())
 		return responseParser(c, res, status, err)
 	})
 
