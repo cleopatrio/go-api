@@ -69,3 +69,7 @@ func (r Router) Route(app *fiber.App) {
 	})
 
 }
+
+func NewRouter(controller interfaces.Controller) Router {
+	return Router{controller: controller}
+}
