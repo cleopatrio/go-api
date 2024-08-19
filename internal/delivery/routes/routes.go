@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/dock-tech/notes-api/internal/domain/exceptions"
+	"github.com/dock-tech/notes-api/internal/domain/interfaces"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -18,75 +19,53 @@ func responseParser(c fiber.Ctx, body any, statusCode int, err error) error {
 	return c.Status(statusCode).JSON(body)
 }
 
-func Route(app *fiber.App) {
+type Router struct {
+	controller interfaces.Controller
+}
+
+func (r Router) Route(app *fiber.App) {
 	groupV1 := app.Group("/v1")
 
 	groupV1.Get("/users", func(c fiber.Ctx) error {
-		users := []string{"John", "Jane", "Bob"}
-		return c.JSON(users)
+		res, status, err := r.controller.ListUsers(c.Context())
+		return responseParser(c, res, status, err)
 	})
 
 	groupV1.Get("/users/:id", func(c fiber.Ctx) error {
-		// Get user by ID
-		userID := c.Params("id")
-		// Your code to fetch user from database or any other data source
-
-		// Return user as JSON response
-		return c.JSON(user)
+		userId := c.Params("id")
+		res, status, err := r.controller.GetUser(c.Context(), userId)
+		return responseParser(c, res, status, err)
 	})
 
 	groupV1.Post("/users", func(c fiber.Ctx) error {
-		// Parse request body to get user data
-		var newUser User
-		if err := c.BodyParser(&newUser); err != nil {
-			return err
-		}
-		// Your code to create a new user in the database or any other data source
-
-		// Return created user as JSON response
-		return c.JSON(newUser)
+		res, status, err := r.controller.CreateUser(c.Context(), c.Body())
+		return responseParser(c, res, status, err)
 	})
 
 	groupV1.Delete("/users/:id", func(c fiber.Ctx) error {
-		// Get user ID from URL parameter
-		userID := c.Params("id")
-		// Your code to fetch user from database or any other data source
-
-		// Your code to delete the user from the database or any other data source
-
-		// Return success message as JSON response
-		return c.JSON(fiber.Map{"message": "User deleted successfully"})
+		userId := c.Params("id")
+		status, err := r.controller.DeleteUser(c.Context(), userId)
+		return responseParser(c, nil, status, err)
 	})
 
 	groupV1.Get("/users/:id/notes", func(c fiber.Ctx) error {
-		// Get user ID from URL parameter
-		userID := c.Params("id")
-		// Your code to fetch user's notes from the database or any other data source
-
-		// Return user's notes as JSON response
-		return c.JSON(notes)
+		userId := c.Params("id")
+		res, status, err := r.controller.ListNotes(c.Context(), userId)
+		return responseParser(c, res, status, err)
 	})
 
-	groupV1.Get("/users/:id/notes/:note_id", func(c fiber.Ctx) error {
-		// Get user ID from URL parameter
-		userID := c.Params("id")
-		// Your code to fetch user's notes from the database or any other data source
-
-		// Return user's notes as JSON response
-		return c.JSON(notes)
+	groupV1.Get("/users/:id/notes/:note_name", func(c fiber.Ctx) error {
+		userId := c.Params("id")
+		noteName := c.Params("note_name")
+		res, status, err := r.controller.GetNote(c.Context(), userId, noteName)
+		return responseParser(c, res, status, err)
 	})
-	groupV1.Post("/users/:id/notes", func(c fiber.Ctx) error {
-		// Get user ID from URL parameter
-		userID := c.Params("id")
-		// Parse request body to get note data
-		var newNote Note
-		if err := c.BodyParser(&newNote); err != nil {
-			return err
-		}
-		// Your code to create a new note for the user in the database or any other data source
 
-		// Return created note as JSON response
-		return c.JSON(newNote)
+	groupV1.Post("/users/:id/notes/:note_name", func(c fiber.Ctx) error {
+		userId := c.Params("id")
+		noteName := c.Params("note_name")
+		res, status, err := r.controller.CreateNote(c.Context(), userId, noteName)
+		return responseParser(c, res, status, err)
 	})
 
 }
