@@ -1,12 +1,18 @@
 package repositories
 
 import (
+	"github.com/dock-tech/notes-api/internal/domain/interfaces"
 	"github.com/dock-tech/notes-api/internal/domain/models"
 	"gorm.io/gorm"
 )
 
 type note struct {
 	connection *gorm.DB
+}
+
+func (n note) List(userId string) (notes []*models.Note, err error) {
+	err = n.connection.Find(&notes).Error
+	return
 }
 
 func (n note) Get(userId string, noteId string) (note *models.Note, err error) {
@@ -18,7 +24,7 @@ func (n note) Get(userId string, noteId string) (note *models.Note, err error) {
 	return
 }
 
-func (n note) Create(note *models.Note) (err error) {
+func (n note) Create(note models.Note) (err error) {
 	err = n.connection.Create(note).Error
 	return
 }
@@ -33,6 +39,6 @@ func (n note) ListNote(userId string) (notes []*models.Note, err error) {
 	return
 }
 
-func NewNote(connection *gorm.DB) *note {
+func NewNote(connection *gorm.DB) interfaces.NoteRepository {
 	return &note{connection: connection}
 }

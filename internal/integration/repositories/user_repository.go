@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"github.com/dock-tech/notes-api/internal/domain/interfaces"
 	"github.com/dock-tech/notes-api/internal/domain/models"
 	"gorm.io/gorm"
 )
@@ -17,8 +18,8 @@ func (n user) Get(userId string) (user *models.User, err error) {
 	return
 }
 
-func (n user) Create(user *models.User) (err error) {
-	err = n.connection.Create(user).Error
+func (n user) Create(user models.User) (err error) {
+	err = n.connection.Create(&user).Error
 	return
 }
 
@@ -32,6 +33,6 @@ func (n user) List(userId string) (users []*models.User, err error) {
 	return
 }
 
-func NewUser(connection *gorm.DB) *user {
+func NewUser(connection *gorm.DB) interfaces.UserRepository {
 	return &user{connection: connection}
 }
