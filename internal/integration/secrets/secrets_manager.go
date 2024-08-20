@@ -8,12 +8,12 @@ import (
 	"github.com/dock-tech/notes-api/internal/domain/interfaces"
 )
 
-type secretClient interface {
+type SecretClient interface {
 	GetSecretValue(ctx context.Context, params *secretsmanager.GetSecretValueInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.GetSecretValueOutput, error)
 }
 
 type secret struct {
-	client secretClient
+	client SecretClient
 }
 
 func (s secret) Get(ctx context.Context, key string) ([]byte, error) {
@@ -26,6 +26,6 @@ func (s secret) Get(ctx context.Context, key string) ([]byte, error) {
 	return []byte(*res.SecretString), nil
 }
 
-func NewSecret(client secretClient) interfaces.Secret {
+func NewSecret(client SecretClient) interfaces.Secret {
 	return &secret{client: client}
 }

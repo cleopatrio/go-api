@@ -52,7 +52,7 @@ func (u *usecase) ListUsers(ctx context.Context) (users []*models.User, err erro
 	return
 }
 
-func NewUsecase(noteRepository interfaces.NoteRepository, userRepository interfaces.UserRepository) interfaces.UseCase {
+func NewUsecase(errorHandlerUsecase interfaces.ErrorHandlerUsecase, noteRepository interfaces.NoteRepository, userRepository interfaces.UserRepository) interfaces.UseCase {
 	return &usecase{
 		noteRepository: noteRepository,
 		userRepository: userRepository,

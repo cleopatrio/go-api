@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Database(cache interfaces.Cache, secret interfaces.Secret) *gorm.DB {
+func NewDb(cache interfaces.Cache, secret interfaces.Secret) *gorm.DB {
 	ctx := context.Background()
 	b, err := cache.Get(ctx, properties.CacheDbSecretKey)
 	if err != nil || b == nil {

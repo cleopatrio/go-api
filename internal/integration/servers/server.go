@@ -17,6 +17,6 @@ func (s server) Serve() {
 	app.Listen(":" + os.Getenv("PORT"))
 }
 
-func NewServer(controllers interfaces.Controller) server {
-	return server{controller: controllers}
+func NewServer(controllers interfaces.Controller) interfaces.Server {
+	return &server{controller: controllers}
 }

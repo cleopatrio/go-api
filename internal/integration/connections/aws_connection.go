@@ -2,12 +2,15 @@ package connections
 
 import (
 	"context"
+	"os"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"os"
+	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	"github.com/dock-tech/notes-api/internal/integration/secrets"
 )
 
-func GetAwsConfig() aws.Config {
+func NewAws() aws.Config {
 	var awsConfig *aws.Config
 	if os.Getenv("AWS_URL") != "" {
 		newAwsConfig, err := config.LoadDefaultConfig(
@@ -39,4 +42,8 @@ func newAwsEndpointResolver() aws.EndpointResolverWithOptionsFunc {
 			HostnameImmutable: true,
 		}, nil
 	}
+}
+
+func NewAwsSecretsManager(cfg aws.Config) secrets.SecretClient {
+	return secretsmanager.NewFromConfig(cfg)
 }

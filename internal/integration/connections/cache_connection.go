@@ -1,11 +1,11 @@
-package connection
+package connections
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 
 	"github.com/dock-tech/notes-api/internal/config/properties"
+	"github.com/dock-tech/notes-api/internal/integration/caches"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -14,9 +14,9 @@ func cache(addr string) *redis.Client {
 	opts := &redis.Options{
 		Addr:       addr,
 		MaxRetries: properties.GetCacheMaxRetries(),
-		TLSConfig: &tls.Config{
-			InsecureSkipVerify: false,
-		},
+		// TLSConfig: &tls.Config{
+		// 	InsecureSkipVerify: false,
+		// },
 		DialTimeout: properties.GetCacheTimeout(),
 	}
 
@@ -34,17 +34,22 @@ func cache(addr string) *redis.Client {
 	return client
 }
 
-func CacheGet() *redis.Client {
+func NewCacheGet() caches.CacheClientSet {
 	return cache(properties.GetCacheGetHost())
 }
 
-func CacheSet() *redis.Client {
+func NewCacheSet() caches.CacheClientGet {
 	return cache(properties.GetCacheSetHost())
 }
 
-func DisconnectCache(clients ...*redis.Client) error {
+func DisconnectCache(clients ...any) error {
 	for _, client := range clients {
-		err := client.Close()
+		redisClient, ok := client.(*redis.Client)
+		if !ok {
+			return fmt.Errorf("invalid cache client")
+		}
+
+		err := redisClient.Close()
 		if err != nil {
 			return err
 		}

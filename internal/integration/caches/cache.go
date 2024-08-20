@@ -1,4 +1,4 @@
-package cache
+package caches
 
 import (
 	"context"
@@ -9,14 +9,16 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type cacheClient interface {
+type CacheClientGet interface {
 	Get(ctx context.Context, key string) *redis.StringCmd
+}
+type CacheClientSet interface {
 	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd
 }
 
 type cache struct {
-	clientSet cacheClient
-	clientGet cacheClient
+	clientSet CacheClientSet
+	clientGet CacheClientGet
 }
 
 func (c cache) Get(ctx context.Context, key string) ([]byte, error) {
@@ -26,6 +28,6 @@ func (c cache) Set(ctx context.Context, key string, value []byte, expiration tim
 	return c.clientSet.Set(ctx, properties.GetCachePrefix()+key, value, expiration).Err()
 }
 
-func NewCache(clientSet, clientGet cacheClient) interfaces.Cache {
+func NewCache(clientSet CacheClientSet, clientGet CacheClientGet) interfaces.Cache {
 	return &cache{clientSet: clientSet, clientGet: clientGet}
 }

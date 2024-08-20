@@ -34,3 +34,11 @@ swagger:
 	swag fmt
 	swag init --parseDependency --parseInternal --parseDepth 1 -g cmd/app/main.go
 
+wire_server:
+	go install github.com/google/wire/cmd/wire
+	wire  ./internal/config/injections/server
+
+wire_cli:
+	go install github.com/google/wire/cmd/wire
+	wire  ./internal/config/injections/cli
+
