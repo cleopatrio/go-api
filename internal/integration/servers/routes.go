@@ -1,10 +1,9 @@
-package routes
+package server
 
 import (
 	"errors"
 
 	"github.com/dock-tech/notes-api/internal/domain/exceptions"
-	"github.com/dock-tech/notes-api/internal/domain/interfaces"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -19,11 +18,7 @@ func responseParser(c fiber.Ctx, body any, statusCode int, err error) error {
 	return c.Status(statusCode).JSON(body)
 }
 
-type Router struct {
-	controller interfaces.Controller
-}
-
-func (r Router) Route(app *fiber.App) {
+func (r server) route(app *fiber.App) {
 	groupV1 := app.Group("/v1")
 
 	groupV1.Get("/users", func(c fiber.Ctx) error {
@@ -67,8 +62,4 @@ func (r Router) Route(app *fiber.App) {
 		return responseParser(c, res, status, err)
 	})
 
-}
-
-func NewRouter(controller interfaces.Controller) Router {
-	return Router{controller: controller}
 }
