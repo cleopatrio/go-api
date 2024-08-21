@@ -22,13 +22,12 @@ func (e *errorHandler) HandlePanic(ctx context.Context, recovered any) (response
 }
 
 func (e *errorHandler) HandleError(ctx context.Context, err error) (response []byte, statusCode int) {
-	var errParsed *exceptions.ErrorType
+	errParsed := &exceptions.ErrorType{}
 	if !errors.As(err, errParsed) {
 		errParsed = exceptions.NewInternalServerError(err.Error())
 	}
 
-	slog.ErrorContext(ctx, "errorHandler.HandleError", slog.String("errorDetails", string(errParsed.JSON())),
-	)
+	slog.ErrorContext(ctx, "errorHandler.HandleError", slog.String("errorDetails", string(errParsed.JSON())))
 
 	/*
 	   if errParsed.StatusCode == http.StatusInternalServerError {

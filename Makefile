@@ -18,11 +18,8 @@ build-local:
 run:
 	go run ./cmd/local/main.go
 
-docker_up:
-	./scripts/docker-up.sh
-
-docker_down:
-	./scripts/docker-down.sh
+reload_docker:
+	./scripts/reload_docker.sh
 
 pprof-local:
 	go tool pprof http://localhost:8081/debug/pprof/heap

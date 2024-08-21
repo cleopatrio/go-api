@@ -31,7 +31,7 @@ func InitializeServer() (interfaces.Server, error) {
 	noteRepository := repositories.NewNote(db)
 	userRepository := repositories.NewUser(db)
 	useCase := usecases.NewUsecase(errorHandlerUsecase, noteRepository, userRepository)
-	controller := controllers.NewController(useCase)
+	controller := controllers.NewController(useCase, errorHandlerUsecase)
 	server := servers.NewServer(controller)
 	return server, nil
 }

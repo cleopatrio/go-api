@@ -267,8 +267,9 @@ func (c *controller) ListUsers(ctx context.Context) (response []byte, status int
 	return
 }
 
-func NewController(usecase interfaces.UseCase) interfaces.Controller {
+func NewController(usecase interfaces.UseCase, errorHandlerUsecase interfaces.ErrorHandlerUsecase) interfaces.Controller {
 	return &controller{
-		usecase: usecase,
+		errorHandlerUsecase: errorHandlerUsecase,
+		usecase:             usecase,
 	}
 }

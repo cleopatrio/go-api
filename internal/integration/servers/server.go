@@ -14,7 +14,7 @@ type server struct {
 func (s server) Serve() {
 	app := fiber.New()
 	s.route(app)
-	app.Listen(":" + os.Getenv("PORT"))
+	app.Listen(":" + os.Getenv("SERVER_PORT"))
 }
 
 func NewServer(controllers interfaces.Controller) interfaces.Server {
