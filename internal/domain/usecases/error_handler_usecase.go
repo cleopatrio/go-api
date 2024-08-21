@@ -22,8 +22,8 @@ func (e *errorHandler) HandlePanic(ctx context.Context, recovered any) (response
 }
 
 func (e *errorHandler) HandleError(ctx context.Context, err error) (response []byte, statusCode int) {
-	errParsed := &exceptions.ErrorType{}
-	if !errors.As(err, errParsed) {
+	var errParsed *exceptions.ErrorType
+	if !errors.As(err, &errParsed) {
 		errParsed = exceptions.NewInternalServerError(err.Error())
 	}
 

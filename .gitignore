@@ -20,3 +20,5 @@ go.work.sum
 
 # Intelij
 .idea/
+
+.postgres-data/

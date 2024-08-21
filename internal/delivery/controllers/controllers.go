@@ -40,6 +40,8 @@ func (c *controller) CreateNote(ctx context.Context, userId string, body []byte)
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
 
+	note.UserId = userId
+
 	if err = validations.Validate(&note); err != nil {
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
@@ -80,6 +82,10 @@ func (c *controller) CreateUser(ctx context.Context, body []byte) (response []by
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
 
+	if err = validations.Validate(&user); err != nil {
+		return c.errorHandlerUsecase.HandleError(ctx, err)
+	}
+
 	createdUser, err := c.usecase.CreateUser(ctx, user)
 	if err != nil {
 		return c.errorHandlerUsecase.HandleError(ctx, err)
@@ -102,7 +108,7 @@ func (c *controller) CreateUser(ctx context.Context, body []byte) (response []by
 	return
 }
 
-func (c *controller) DeleteNote(ctx context.Context, userId, noteId string) (response []byte, status int) {
+func (c *controller) DeleteNote(ctx context.Context, noteId, userId string) (response []byte, status int) {
 	defer c.deferHandler(ctx, &response, &status)
 
 	slog.InfoContext(ctx, "controller.DeleteNote",
