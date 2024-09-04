@@ -18,11 +18,6 @@ type note struct {
 	connection *gorm.DB
 }
 
-func (n note) List(ctx context.Context, userId string) (notes []*models.Note, err error) {
-	err = n.connection.Where(&models.Note{UserId: userId}).Find(&notes).Error
-	return
-}
-
 func (n note) Get(ctx context.Context, userId string, noteId string) (note *models.Note, err error) {
 	err = n.connection.Where(
 		&models.Note{
@@ -57,21 +52,21 @@ func (n note) Create(ctx context.Context, note models.Note) (createdNote *models
 	return
 }
 
-func (n note) Delete(ctx context.Context, noteId string) (err error) {
-	tx := n.connection.Delete(&models.Note{Id: noteId})
+func (n note) Delete(ctx context.Context, userId, noteId string) (err error) {
+	tx := n.connection.Delete(&models.Note{Id: noteId, UserId: userId})
 	err = tx.Error
 	if err != nil {
-		err = exceptions.NewInternalServerError(fmt.Sprintf("failed to delete note with id %s", noteId), err.Error())
+		err = exceptions.NewInternalServerError(fmt.Sprintf("failed to delete note with id %s and userId %s", noteId, userId), err.Error())
 	}
 
 	if tx.RowsAffected == 0 {
-		err = exceptions.NewNotFoundError(fmt.Sprintf("note with id %s not found", noteId))
+		err = exceptions.NewNotFoundError(fmt.Sprintf("note with id %s and user %s not found", noteId, userId))
 		return
 	}
 	return
 }
 
-func (n note) ListNote(ctx context.Context, userId string) (notes []*models.Note, err error) {
+func (n note) List(ctx context.Context, userId string) (notes []*models.Note, err error) {
 	err = n.connection.Where(&models.Note{UserId: userId}).Find(&notes).Error
 	if err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("failed to list notes from userId %s", userId), err.Error())
@@ -79,6 +74,6 @@ func (n note) ListNote(ctx context.Context, userId string) (notes []*models.Note
 	return
 }
 
-func NewNote(connection *gorm.DB) interfaces.NoteRepository {
+func NewNote(connection *gorm.DB) interfaces.NotesUseCase {
 	return &note{connection: connection}
 }

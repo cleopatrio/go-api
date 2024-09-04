@@ -7,20 +7,19 @@
 package injections
 
 import (
+	"github.com/dock-tech/notes-api/internal/config/connections"
 	"github.com/dock-tech/notes-api/internal/delivery/controllers"
+	"github.com/dock-tech/notes-api/internal/delivery/servers"
 	"github.com/dock-tech/notes-api/internal/domain/interfaces"
 	"github.com/dock-tech/notes-api/internal/domain/usecases"
 	"github.com/dock-tech/notes-api/internal/integration/caches"
-	"github.com/dock-tech/notes-api/internal/integration/connections"
 	"github.com/dock-tech/notes-api/internal/integration/repositories"
 	"github.com/dock-tech/notes-api/internal/integration/secrets"
-	"github.com/dock-tech/notes-api/internal/integration/servers"
 )
 
 // Injectors from wire.go:
 
 func InitializeServer() (interfaces.Server, error) {
-	errorHandlerUsecase := usecases.NewErrorHandler()
 	cacheClientSet := connections.NewCacheGet()
 	cacheClientGet := connections.NewCacheSet()
 	cache := caches.NewCache(cacheClientSet, cacheClientGet)
@@ -28,10 +27,10 @@ func InitializeServer() (interfaces.Server, error) {
 	secretClient := connections.NewAwsSecretsManager(config)
 	secret := secrets.NewSecret(secretClient)
 	db := connections.NewDb(cache, secret)
-	noteRepository := repositories.NewNote(db)
-	userRepository := repositories.NewUser(db)
-	useCase := usecases.NewUsecase(errorHandlerUsecase, noteRepository, userRepository)
-	controller := controllers.NewController(useCase, errorHandlerUsecase)
+	notesUseCase := repositories.NewNote(db)
+	usersUseCase := repositories.NewUser(db)
+	errorHandlerUsecase := usecases.NewErrorHandler()
+	controller := controllers.NewController(notesUseCase, usersUseCase, errorHandlerUsecase)
 	server := servers.NewServer(controller)
 	return server, nil
 }

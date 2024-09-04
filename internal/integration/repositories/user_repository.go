@@ -57,6 +57,6 @@ func (n user) List(ctx context.Context) (users []*models.User, err error) {
 	return
 }
 
-func NewUser(connection *gorm.DB) interfaces.UserRepository {
+func NewUser(connection *gorm.DB) interfaces.UsersUseCase {
 	return &user{connection: connection}
 }

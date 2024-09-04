@@ -14,7 +14,8 @@ import (
 )
 
 type controller struct {
-	usecase             interfaces.UseCase
+	usersUseCase        interfaces.UsersUseCase
+	notesUseCase        interfaces.NotesUseCase
 	errorHandlerUsecase interfaces.ErrorHandlerUsecase
 }
 
@@ -46,7 +47,7 @@ func (c *controller) CreateNote(ctx context.Context, userId string, body []byte)
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
 
-	createdNote, err := c.usecase.CreateNote(ctx, note)
+	createdNote, err := c.notesUseCase.Create(ctx, note)
 	if err != nil {
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
@@ -86,7 +87,7 @@ func (c *controller) CreateUser(ctx context.Context, body []byte) (response []by
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
 
-	createdUser, err := c.usecase.CreateUser(ctx, user)
+	createdUser, err := c.usersUseCase.Create(ctx, user)
 	if err != nil {
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
@@ -117,7 +118,7 @@ func (c *controller) DeleteNote(ctx context.Context, noteId, userId string) (res
 		slog.String("userId", userId),
 	)
 
-	err := c.usecase.DeleteNote(ctx, userId, noteId)
+	err := c.notesUseCase.Delete(ctx, userId, noteId)
 	if err != nil {
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
@@ -139,7 +140,7 @@ func (c *controller) DeleteUser(ctx context.Context, id string) (response []byte
 		slog.String("userId", id),
 	)
 
-	err := c.usecase.DeleteUser(ctx, id)
+	err := c.usersUseCase.Delete(ctx, id)
 	if err != nil {
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
@@ -162,7 +163,7 @@ func (c *controller) GetNote(ctx context.Context, userId string, noteId string) 
 		slog.String("userId", userId),
 	)
 
-	note, err := c.usecase.GetNote(ctx, userId, noteId)
+	note, err := c.notesUseCase.Get(ctx, userId, noteId)
 	if err != nil {
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
@@ -192,7 +193,7 @@ func (c *controller) GetUser(ctx context.Context, id string) (response []byte, s
 		slog.String("userId", id),
 	)
 
-	user, err := c.usecase.GetUser(ctx, id)
+	user, err := c.usersUseCase.Get(ctx, id)
 	if err != nil {
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
@@ -222,7 +223,7 @@ func (c *controller) ListNotes(ctx context.Context, userId string) (response []b
 		slog.String("userId", userId),
 	)
 
-	notes, err := c.usecase.ListNotes(ctx, userId)
+	notes, err := c.notesUseCase.List(ctx, userId)
 	if err != nil {
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
@@ -251,7 +252,7 @@ func (c *controller) ListUsers(ctx context.Context) (response []byte, status int
 		slog.String("details", "process started"),
 	)
 
-	users, err := c.usecase.ListUsers(ctx)
+	users, err := c.usersUseCase.List(ctx)
 	if err != nil {
 		return c.errorHandlerUsecase.HandleError(ctx, err)
 	}
@@ -273,9 +274,10 @@ func (c *controller) ListUsers(ctx context.Context) (response []byte, status int
 	return
 }
 
-func NewController(usecase interfaces.UseCase, errorHandlerUsecase interfaces.ErrorHandlerUsecase) interfaces.Controller {
+func NewController(notesUseCase interfaces.NotesUseCase, usersUseCase interfaces.UsersUseCase, errorHandlerUsecase interfaces.ErrorHandlerUsecase) interfaces.Controller {
 	return &controller{
 		errorHandlerUsecase: errorHandlerUsecase,
-		usecase:             usecase,
+		usersUseCase:        usersUseCase,
+		notesUseCase:        notesUseCase,
 	}
 }
