@@ -21,6 +21,7 @@ func NewAws() aws.Config {
 
 func NewAwsSecretsManager(cfg aws.Config) secrets.SecretClient {
 	if awsUrl := os.Getenv("AWS_URL"); awsUrl != "" {
+		println("Using AWS_URL: ", awsUrl)
 		return secretsmanager.NewFromConfig(cfg, func(o *secretsmanager.Options) {
 			o.BaseEndpoint = &awsUrl
 		})

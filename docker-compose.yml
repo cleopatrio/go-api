@@ -3,18 +3,18 @@ version: "3.8"
 services:
   localstack:
     container_name: localstack
-    image: localstack/localstack
+    image: localstack/localstack:3.6.0
     ports:
-      - "4566:4566"
+      - '4566-4597:4566-4597'
     environment:
-      - EDGE_PORT=4566
-      - DEBUG=${DEBUG:-0}
+      - SERVICES=iam,secretsmanager
+      - DEBUG=1
     volumes:
-      - ./scripts/localstack:/etc/localstack/init/ready.d
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./scripts/localstack:/etc/localstack/init/ready.d/
+      - /var/run/docker.sock:/var/run/docker.sock
 
   postgres:
-    image: postgres:10.5
+    image: postgres:16
     container_name: postgres
     restart: always
     environment:
@@ -31,7 +31,7 @@ services:
       - ./scripts/sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
       
   redis:
-    image: "redis:latest"
+    image: redis:7.4.0
     container_name: redis
     ports:
       - "6379:6379"

@@ -13,20 +13,20 @@ import (
 
 func NewDb(cache interfaces.Cache, secret interfaces.Secret) *gorm.DB {
 	ctx := context.Background()
-	b, err := cache.Get(ctx, properties.CacheDbSecretKey)
-	if err != nil || b == nil {
-		b, err = secret.Get(ctx, properties.GetSecretDatabase())
+	secretBytes, err := cache.Get(ctx, properties.CacheDbSecretKey)
+	if err != nil || secretBytes == nil {
+		secretBytes, err = secret.Get(ctx, properties.GetSecretDatabase())
 		if err != nil {
 			panic(err)
 		}
-		err = cache.Set(ctx, properties.CacheDbSecretKey, b, properties.CacheExpiration)
+		err = cache.Set(ctx, properties.CacheDbSecretKey, secretBytes, properties.CacheExpiration)
 		if err != nil {
 			fmt.Printf("Error setting cache: %s \n", err.Error())
 		}
 	}
 
 	var secretData map[string]any
-	err = json.Unmarshal(b, &secretData)
+	err = json.Unmarshal(secretBytes, &secretData)
 	if err != nil {
 		fmt.Printf("Error parsing secret: %s \n", err.Error())
 	}
