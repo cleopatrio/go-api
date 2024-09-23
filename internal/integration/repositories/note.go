@@ -8,6 +8,7 @@ import (
 	"github.com/dock-tech/notes-api/internal/domain/exceptions"
 	"github.com/dock-tech/notes-api/internal/integration/adapters"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/gorm"
 	"time"
 )
@@ -40,7 +41,8 @@ func (n *noteRepository) Create(ctx context.Context, note entity.Note) (*entity.
 	createdNote.UpdatedAt = &now
 	err := n.connection.WithContext(ctx).Create(&note).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23503" {
 			return nil, exceptions.NewNotFoundError(fmt.Sprintf("user with id %s not found", note.UserId))
 		}
 		return nil, exceptions.NewInternalServerError("failed to create note", err.Error())
