@@ -7,10 +7,8 @@ import (
 	"github.com/dock-tech/notes-api/internal/domain/entity"
 	"github.com/dock-tech/notes-api/internal/domain/exceptions"
 	"github.com/dock-tech/notes-api/internal/integration/adapters"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"time"
 )
 
 type userRepository struct {
@@ -31,17 +29,12 @@ func (u *userRepository) Get(ctx context.Context, userId string) (*entity.User, 
 }
 
 func (u *userRepository) Create(ctx context.Context, user entity.User) (*entity.User, error) {
-	createdUser := &user
-	createdUser.Id = uuid.NewString()
-	now := time.Now()
-	createdUser.CreatedAt = &now
-	createdUser.UpdatedAt = &now
 	err := u.connection.WithContext(ctx).Create(&user).Error
 	if err != nil {
 		return nil, exceptions.NewInternalServerError("failed to create user", err.Error())
 	}
 
-	return createdUser, nil
+	return &user, nil
 }
 
 func (u *userRepository) Delete(ctx context.Context, userId string) error {

@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -16,4 +18,16 @@ type Note struct {
 
 func (Note) TableName() string {
 	return "notes"
+}
+
+func (Note) BeforeCreate(db *gorm.DB) (err error) {
+	db.Statement.SetColumn("created_at", time.Now())
+	db.Statement.SetColumn("updated_at", time.Now())
+	db.Statement.SetColumn("id", uuid.New())
+	return
+}
+
+func (Note) BeforeUpdate(db *gorm.DB) (err error) {
+	db.Statement.SetColumn("updated_at", time.Now())
+	return
 }

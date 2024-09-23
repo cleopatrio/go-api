@@ -7,10 +7,8 @@ import (
 	"github.com/dock-tech/notes-api/internal/domain/entity"
 	"github.com/dock-tech/notes-api/internal/domain/exceptions"
 	"github.com/dock-tech/notes-api/internal/integration/adapters"
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/gorm"
-	"time"
 )
 
 type noteRepository struct {
@@ -34,11 +32,6 @@ func (n *noteRepository) Get(ctx context.Context, userId string, noteId string) 
 }
 
 func (n *noteRepository) Create(ctx context.Context, note entity.Note) (*entity.Note, error) {
-	createdNote := &note
-	createdNote.Id = uuid.NewString()
-	now := time.Now()
-	createdNote.CreatedAt = &now
-	createdNote.UpdatedAt = &now
 	err := n.connection.WithContext(ctx).Create(&note).Error
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -47,7 +40,7 @@ func (n *noteRepository) Create(ctx context.Context, note entity.Note) (*entity.
 		}
 		return nil, exceptions.NewInternalServerError("failed to create note", err.Error())
 	}
-	return createdNote, nil
+	return &note, nil
 }
 
 func (n *noteRepository) Delete(ctx context.Context, userId, noteId string) error {
