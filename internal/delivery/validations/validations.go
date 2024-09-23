@@ -2,10 +2,8 @@ package validations
 
 import (
 	"fmt"
-
-	"github.com/go-playground/validator/v10"
-
 	"github.com/dock-tech/notes-api/internal/domain/exceptions"
+	"github.com/go-playground/validator/v10"
 )
 
 func getError(tag string, field string) string {
