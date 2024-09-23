@@ -21,6 +21,10 @@ func GetEnv() string {
 	return os.Getenv("ENV")
 }
 
+func GetRegion() string {
+	return os.Getenv("AWS_REGION")
+}
+
 func GetDatabaseTimeout() string {
 	return os.Getenv("DATABASE_TIMEOUT")
 }
