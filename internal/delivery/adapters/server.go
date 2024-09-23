@@ -1,4 +1,4 @@
-package interfaces
+package adapters
 
 type Server interface {
 	Serve()

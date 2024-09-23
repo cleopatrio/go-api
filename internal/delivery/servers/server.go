@@ -1,14 +1,15 @@
 package servers
 
 import (
+	"github.com/dock-tech/notes-api/internal/delivery/adapters"
 	"os"
 
-	"github.com/dock-tech/notes-api/internal/domain/interfaces"
 	"github.com/gofiber/fiber/v3"
 )
 
 type server struct {
-	controller interfaces.Controller
+	usersController adapters.UsersController
+	notesController adapters.NotesController
 }
 
 func (s server) Serve() {
@@ -17,6 +18,9 @@ func (s server) Serve() {
 	app.Listen(":" + os.Getenv("SERVER_PORT"))
 }
 
-func NewServer(controllers interfaces.Controller) interfaces.Server {
-	return &server{controller: controllers}
+func NewServer(usersController adapters.UsersController, notesController adapters.NotesController) adapters.Server {
+	return &server{
+		usersController: usersController,
+		notesController: notesController,
+	}
 }

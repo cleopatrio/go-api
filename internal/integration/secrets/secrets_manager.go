@@ -2,10 +2,9 @@ package secrets
 
 import (
 	"context"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
-	"github.com/dock-tech/notes-api/internal/domain/interfaces"
+	"github.com/dock-tech/notes-api/internal/integration/adapters"
 )
 
 type SecretClient interface {
@@ -26,6 +25,6 @@ func (s secret) Get(ctx context.Context, key string) ([]byte, error) {
 	return []byte(*res.SecretString), nil
 }
 
-func NewSecret(client SecretClient) interfaces.Secret {
+func NewSecret(client SecretClient) adapters.Secret {
 	return &secret{client: client}
 }

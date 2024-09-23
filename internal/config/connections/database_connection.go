@@ -4,14 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
 	"github.com/dock-tech/notes-api/internal/config/properties"
-	"github.com/dock-tech/notes-api/internal/domain/interfaces"
+	"github.com/dock-tech/notes-api/internal/integration/adapters"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func NewDb(cache interfaces.Cache, secret interfaces.Secret) *gorm.DB {
+func NewDb(cache adapters.Cache, secret adapters.Secret) *gorm.DB {
 	ctx := context.Background()
 	secretBytes, err := cache.Get(ctx, properties.CacheDbSecretKey)
 	if err != nil || secretBytes == nil {

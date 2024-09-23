@@ -1,13 +1,13 @@
-package usecases
+package controllers
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/dock-tech/notes-api/internal/delivery/adapters"
 	"log/slog"
 
 	"github.com/dock-tech/notes-api/internal/domain/exceptions"
-	"github.com/dock-tech/notes-api/internal/domain/interfaces"
 )
 
 type errorHandler struct {
@@ -38,6 +38,6 @@ func (e *errorHandler) HandleError(ctx context.Context, err error) (response []b
 	return errParsed.JSON(), errParsed.StatusCode
 }
 
-func NewErrorHandler() interfaces.ErrorHandlerUsecase {
+func NewErrorHandler() adapters.ErrorHandler {
 	return &errorHandler{}
 }
