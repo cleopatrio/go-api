@@ -162,4 +162,3 @@ to their functions.
       ```
 
 - To stop the application just hit `Ctrl + C`:
-
