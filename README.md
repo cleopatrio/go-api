@@ -103,7 +103,7 @@ This project was developed using the following technologies:
 For the organization of the application, it was separated into several folders so that they were distributed according
 to their functions.
 
-- ### **dda-core-api**
+- ### **go-api**
 
     - ***Env***
         - Contains local environment variables.
