@@ -16,26 +16,12 @@ build-local:
 	go build -o $(APP_NAME) -ldflags="-s -w" ./cmd/local/main.go
 
 run:
-	go run ./cmd/local/main.go
+	go run ./cmd/server/main.go
 
-reload_docker:
-	./scripts/reload_docker.sh
+tests:
+	go test -v ./test/integration/...
+	go test -v ./test/unit/...
 
-pprof-local:
-	go tool pprof http://localhost:8081/debug/pprof/heap
-
-pprof-rancher:
-	go tool pprof http://localhost:8585/debug/pprof/heap
-
-swagger:
-	swag fmt
-	swag init --parseDependency --parseInternal --parseDepth 1 -g cmd/app/main.go
-
-wire_server:
-	go install github.com/google/wire/cmd/wire
-	wire  ./internal/config/injections/server
-
-wire_cli:
-	go install github.com/google/wire/cmd/wire
-	wire  ./internal/config/injections/cli
+docker-up:
+	./scripts/docker_up.sh
 
