@@ -1,3 +1,3 @@
-docker-compose -p notes-api -f ./build/docker-compose.yml down --volumes
+docker-compose -p go-api -f docker-compose.yml down --volumes
 
-docker-compose -p notes-api -f ./build/docker-compose.yml up -d
+docker-compose -p go-api -f docker-compose.yml up -d

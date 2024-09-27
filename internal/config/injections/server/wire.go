@@ -1,7 +1,8 @@
 package injections
 
 import (
-	"github.com/dock-tech/notes-api/internal/config/connections"
+	"github.com/dock-tech/notes-api/internal/config/connections/aws"
+	"github.com/dock-tech/notes-api/internal/config/connections/database"
 	"github.com/dock-tech/notes-api/internal/delivery/adapters"
 	"github.com/dock-tech/notes-api/internal/delivery/controllers"
 	"github.com/dock-tech/notes-api/internal/delivery/servers"
@@ -12,13 +13,13 @@ import (
 )
 
 func InitializeServer() (adapters.Server, error) {
-	cacheClientSet := connections.NewCacheGet()
-	cacheClientGet := connections.NewCacheSet()
+	cacheClientSet := database.NewCacheGet()
+	cacheClientGet := database.NewCacheSet()
 	cache := caches.NewCache(cacheClientSet, cacheClientGet)
-	config := connections.NewAws()
-	secretClient := connections.NewAwsSecretsManager(config)
+	config := aws.NewAws()
+	secretClient := aws.NewAwsSecretsManager(config)
 	secret := secrets.NewSecret(secretClient)
-	db := connections.NewDb(cache, secret)
+	db := database.NewDb(cache, secret)
 	notesRepository := repositories.NewNote(db)
 	usersRepository := repositories.NewUser(db)
 	errorHandler := controllers.NewErrorHandler()

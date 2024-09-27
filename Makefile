@@ -23,5 +23,8 @@ tests:
 	go test -v ./test/unit/...
 
 docker-up:
-	./scripts/docker_up.sh
+	./scripts/docker-up.sh
+
+docker-down:
+	./scripts/docker-down.sh
 

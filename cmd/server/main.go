@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
- 	err := godotenv.Load("./env/.env.localstack")
+	err := godotenv.Load("./env/.env.localstack")
 	if err != nil {
 		err := godotenv.Load("../../env/.env.localstack")
 		if err != nil {
@@ -18,5 +18,8 @@ func main() {
 		panic(err)
 	}
 
-	server.Serve()
+	err = server.Serve()
+	if err != nil {
+		panic(err)
+	}
 }

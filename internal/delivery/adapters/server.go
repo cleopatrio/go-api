@@ -1,5 +1,5 @@
 package adapters
 
 type Server interface {
-	Serve()
+	Serve() error
 }

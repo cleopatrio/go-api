@@ -12,10 +12,10 @@ type server struct {
 	notesController adapters.NotesController
 }
 
-func (s server) Serve() {
+func (s server) Serve() error {
 	app := fiber.New()
 	s.route(app)
-	app.Listen(":" + os.Getenv("SERVER_PORT"))
+	return app.Listen(":" + os.Getenv("SERVER_PORT"))
 }
 
 func NewServer(usersController adapters.UsersController, notesController adapters.NotesController) adapters.Server {
