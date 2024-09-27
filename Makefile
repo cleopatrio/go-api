@@ -16,21 +16,12 @@ build-local:
 	go build -o $(APP_NAME) -ldflags="-s -w" ./cmd/local/main.go
 
 run:
-	go run ./cmd/local/main.go
+	go run ./cmd/server/main.go
 
-docker_up:
-	./scripts/docker-up.sh
+tests:
+	go test -v ./test/integration/...
+	go test -v ./test/unit/...
 
-docker_down:
-	./scripts/docker-down.sh
-
-pprof-local:
-	go tool pprof http://localhost:8081/debug/pprof/heap
-
-pprof-rancher:
-	go tool pprof http://localhost:8585/debug/pprof/heap
-
-swagger:
-	swag fmt
-	swag init --parseDependency --parseInternal --parseDepth 1 -g cmd/app/main.go
+docker-up:
+	./scripts/docker_up.sh
 
