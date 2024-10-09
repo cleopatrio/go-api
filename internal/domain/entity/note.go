@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// TODO arrumar entirades (json com dto no delivery) (gorm com model no integration)
 type Note struct {
 	Id        string     `gorm:"column:id;primaryKey" json:"id"`
 	Title     string     `gorm:"column:title;not null" json:"title" validate:"required,min=3"`

@@ -12,6 +12,7 @@ import (
 	"github.com/dock-tech/notes-api/internal/integration/secrets"
 )
 
+// TODO injetar sqs apos criacao
 func InitializeServer() (adapters.Server, error) {
 	cacheClientSet := database.NewCacheGet()
 	cacheClientGet := database.NewCacheSet()

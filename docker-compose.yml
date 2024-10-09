@@ -7,7 +7,6 @@ services:
     ports:
       - '4566-4597:4566-4597'
     environment:
-      - SERVICES=iam,secretsmanager
       - DEBUG=1
     volumes:
       - ./scripts/localstack:/etc/localstack/init/ready.d/

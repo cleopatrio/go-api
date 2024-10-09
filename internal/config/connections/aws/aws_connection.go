@@ -29,3 +29,5 @@ func NewAwsSecretsManager(cfg aws.Config) secrets.SecretClient {
 
 	return secretsmanager.NewFromConfig(cfg)
 }
+
+//TODO: create sqs connection

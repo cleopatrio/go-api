@@ -102,6 +102,7 @@ This project was developed using the following technologies:
 
 For the organization of the application, it was separated into several folders so that they were distributed according
 to their functions.
+[The folder structure can be seen in depth here](https://github.com/golang-standards/project-layout)
 
 - ### **go-api**
 

@@ -10,7 +10,6 @@ import (
 )
 
 func cache(addr string) *redis.Client {
-
 	opts := &redis.Options{
 		Addr:       addr,
 		MaxRetries: properties.GetCacheMaxRetries(),
@@ -40,19 +39,4 @@ func NewCacheGet() caches.CacheClientSet {
 
 func NewCacheSet() caches.CacheClientGet {
 	return cache(properties.GetCacheSetHost())
-}
-
-func DisconnectCache(clients ...any) error {
-	for _, client := range clients {
-		redisClient, ok := client.(*redis.Client)
-		if !ok {
-			return fmt.Errorf("invalid cache client")
-		}
-
-		err := redisClient.Close()
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }

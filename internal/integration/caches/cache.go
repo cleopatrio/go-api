@@ -2,10 +2,9 @@ package caches
 
 import (
 	"context"
-	"time"
-
 	"github.com/dock-tech/notes-api/internal/config/properties"
 	"github.com/redis/go-redis/v9"
+	"time"
 )
 
 type CacheClientGet interface {
