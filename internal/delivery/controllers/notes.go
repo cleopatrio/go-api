@@ -19,13 +19,13 @@ type notesController struct {
 	deleteNoteUseCase   usecases.DeleteNoteUseCase
 	getNoteUseCase      usecases.GetNoteUseCase
 	listNotesUseCase    usecases.ListNotesUseCase
-	errorHandlerUsecase adapters.ErrorHandler
+	errorHandler adapters.ErrorHandler
 }
 
 func (n *notesController) deferHandler(ctx context.Context, response *[]byte, status *int) {
 	r := recover()
 	if r != nil {
-		*response, *status = n.errorHandlerUsecase.HandlePanic(ctx, r)
+		*response, *status = n.errorHandler.HandlePanic(ctx, r)
 	}
 }
 
@@ -41,23 +41,23 @@ func (n *notesController) CreateNote(ctx context.Context, userId string, body []
 	err := json.Unmarshal(body, &note)
 	if err != nil {
 		err = exceptions.NewValidationError(fmt.Sprintf("error parsing JSON to note: %s", err.Error()))
-		return n.errorHandlerUsecase.HandleError(ctx, err)
+		return n.errorHandler.HandleError(ctx, err)
 	}
 
 	note.UserId = userId
 
 	if err = validations.Validate(&note); err != nil {
-		return n.errorHandlerUsecase.HandleError(ctx, err)
+		return n.errorHandler.HandleError(ctx, err)
 	}
 
 	createdNote, err := n.createNoteUseCase.Create(ctx, note.ToEntity())
 	if err != nil {
-		return n.errorHandlerUsecase.HandleError(ctx, err)
+		return n.errorHandler.HandleError(ctx, err)
 	}
 
 	if response, err = json.Marshal(note.FromEntity(createdNote)); err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("error parsing note to JSON: %s", err.Error()))
-		return n.errorHandlerUsecase.HandleError(ctx, err)
+		return n.errorHandler.HandleError(ctx, err)
 	}
 
 	status = http.StatusCreated
@@ -82,7 +82,7 @@ func (n *notesController) DeleteNote(ctx context.Context, noteId, userId string)
 
 	err := n.deleteNoteUseCase.Delete(ctx, userId, noteId)
 	if err != nil {
-		return n.errorHandlerUsecase.HandleError(ctx, err)
+		return n.errorHandler.HandleError(ctx, err)
 	}
 
 	status = http.StatusNoContent
@@ -105,14 +105,14 @@ func (n *notesController) GetNote(ctx context.Context, userId string, noteId str
 
 	note, err := n.getNoteUseCase.Get(ctx, userId, noteId)
 	if err != nil {
-		return n.errorHandlerUsecase.HandleError(ctx, err)
+		return n.errorHandler.HandleError(ctx, err)
 	}
 
 	var noteDto dtos.Note
 	response, err = json.Marshal(noteDto.FromEntity(note))
 	if err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("error parsing note to JSON: %s", err.Error()))
-		return n.errorHandlerUsecase.HandleError(ctx, err)
+		return n.errorHandler.HandleError(ctx, err)
 	}
 
 	status = http.StatusOK
@@ -136,14 +136,14 @@ func (n *notesController) ListNotes(ctx context.Context, userId string) (respons
 
 	notes, err := n.listNotesUseCase.List(ctx, userId)
 	if err != nil {
-		return n.errorHandlerUsecase.HandleError(ctx, err)
+		return n.errorHandler.HandleError(ctx, err)
 	}
 
 	var notesDto dtos.Notes
 	response, err = json.Marshal(notesDto.FromEntities(notes))
 	if err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("error parsing notes to JSON: %s", err.Error()))
-		return n.errorHandlerUsecase.HandleError(ctx, err)
+		return n.errorHandler.HandleError(ctx, err)
 	}
 
 	status = http.StatusOK
@@ -169,6 +169,6 @@ func NewNotesController(
 		deleteNoteUseCase:   deleteNoteUseCase,
 		getNoteUseCase:      getNoteUseCase,
 		listNotesUseCase:    listNoteUseCase,
-		errorHandlerUsecase: errorHandlerUsecase,
+		errorHandler: errorHandlerUsecase,
 	}
 }

@@ -15,17 +15,17 @@ import (
 )
 
 type userController struct {
-	createUserUseCase   usecases.CreateUserUseCase
-	deleteUserUseCase   usecases.DeleteUserUseCase
-	getUserUseCase      usecases.GetUserUseCase
-	listUsersUseCase    usecases.ListUsersUseCase
-	errorHandlerUsecase adapters.ErrorHandler
+	createUserUseCase usecases.CreateUserUseCase
+	deleteUserUseCase usecases.DeleteUserUseCase
+	getUserUseCase    usecases.GetUserUseCase
+	listUsersUseCase  usecases.ListUsersUseCase
+	errorHandler      adapters.ErrorHandler
 }
 
 func (u *userController) deferHandler(ctx context.Context, response *[]byte, status *int) {
 	r := recover()
 	if r != nil {
-		*response, *status = u.errorHandlerUsecase.HandlePanic(ctx, r)
+		*response, *status = u.errorHandler.HandlePanic(ctx, r)
 	}
 }
 
@@ -41,16 +41,16 @@ func (u *userController) CreateUser(ctx context.Context, body []byte) (response 
 	err := json.Unmarshal(body, &user)
 	if err != nil {
 		err = exceptions.NewValidationError(fmt.Sprintf("error parsing json to user: %s", err.Error()))
-		return u.errorHandlerUsecase.HandleError(ctx, err)
+		return u.errorHandler.HandleError(ctx, err)
 	}
 
 	if err = validations.Validate(&user); err != nil {
-		return u.errorHandlerUsecase.HandleError(ctx, err)
+		return u.errorHandler.HandleError(ctx, err)
 	}
 
 	createdUser, err := u.createUserUseCase.Create(ctx, user.ToEntity())
 	if err != nil {
-		return u.errorHandlerUsecase.HandleError(ctx, err)
+		return u.errorHandler.HandleError(ctx, err)
 	}
 
 	status = http.StatusCreated
@@ -58,7 +58,7 @@ func (u *userController) CreateUser(ctx context.Context, body []byte) (response 
 	response, err = json.Marshal(user.FromEntity(createdUser))
 	if err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("error parsing user to JSON: %s", err.Error()))
-		return u.errorHandlerUsecase.HandleError(ctx, err)
+		return u.errorHandler.HandleError(ctx, err)
 	}
 
 	slog.InfoContext(
@@ -79,7 +79,7 @@ func (u *userController) DeleteUser(ctx context.Context, id string) (response []
 
 	err := u.deleteUserUseCase.Delete(ctx, id)
 	if err != nil {
-		return u.errorHandlerUsecase.HandleError(ctx, err)
+		return u.errorHandler.HandleError(ctx, err)
 	}
 
 	status = http.StatusNoContent
@@ -102,14 +102,14 @@ func (u *userController) GetUser(ctx context.Context, id string) (response []byt
 
 	user, err := u.getUserUseCase.Get(ctx, id)
 	if err != nil {
-		return u.errorHandlerUsecase.HandleError(ctx, err)
+		return u.errorHandler.HandleError(ctx, err)
 	}
 
 	var userDTO dtos.User
 	response, err = json.Marshal(userDTO.FromEntity(user))
 	if err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("error parsing user to JSON: %s", err.Error()))
-		return u.errorHandlerUsecase.HandleError(ctx, err)
+		return u.errorHandler.HandleError(ctx, err)
 	}
 
 	status = http.StatusOK
@@ -132,14 +132,14 @@ func (u *userController) ListUsers(ctx context.Context) (response []byte, status
 
 	users, err := u.listUsersUseCase.List(ctx)
 	if err != nil {
-		return u.errorHandlerUsecase.HandleError(ctx, err)
+		return u.errorHandler.HandleError(ctx, err)
 	}
 
 	var usersDTO dtos.Users
 	response, err = json.Marshal(usersDTO.FromEntities(users))
 	if err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("error parsing users to JSON: %s", err.Error()))
-		return u.errorHandlerUsecase.HandleError(ctx, err)
+		return u.errorHandler.HandleError(ctx, err)
 	}
 
 	status = http.StatusOK
@@ -161,10 +161,10 @@ func NewUsersController(
 	errorHandlerUsecase adapters.ErrorHandler,
 ) adapters.UsersController {
 	return &userController{
-		createUserUseCase:   createUserUseCase,
-		deleteUserUseCase:   deleteUserUseCase,
-		getUserUseCase:      getUserUseCase,
-		listUsersUseCase:    listUsersUseCase,
-		errorHandlerUsecase: errorHandlerUsecase,
+		createUserUseCase: createUserUseCase,
+		deleteUserUseCase: deleteUserUseCase,
+		getUserUseCase:    getUserUseCase,
+		listUsersUseCase:  listUsersUseCase,
+		errorHandler:      errorHandlerUsecase,
 	}
 }

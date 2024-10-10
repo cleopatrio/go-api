@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/dock-tech/notes-api/internal/delivery/adapters"
 	"log/slog"
+
+	"github.com/dock-tech/notes-api/internal/delivery/adapters"
 
 	"github.com/dock-tech/notes-api/internal/domain/exceptions"
 )
