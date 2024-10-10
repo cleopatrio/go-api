@@ -23,12 +23,11 @@ func (u User) ToEntity() entities.User {
 }
 
 func (u User) FromEntity(user *entities.User) User {
-	return User{
-		Id:        user.Id,
-		Name:      user.Name,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-	}
+	u.Id = user.Id
+	u.Name = user.Name
+	u.CreatedAt = user.CreatedAt
+	u.UpdatedAt = user.UpdatedAt
+	return u
 }
 
 type Users []*User

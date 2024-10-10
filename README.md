@@ -106,15 +106,12 @@ to their functions.
 
 - ### **go-api**
 
-    - ***Env***
+    - ***env***
         - Contains local environment variables.
-
-    - ***pkg***
-        - Contains all packages that are shared with other applications.
 
     - ***internal***
         - Contains all application layers.
-        - ***application***
+        - ***config***
             - Contains all projects configs (DB, properties, dependency wiring).
         - ***delivery***
             - Contains the entrance layer to the api (controllers, DTOs, contracts, etc...).
@@ -126,7 +123,7 @@ to their functions.
     - ***cmd***
         - Contains golang entrypoint.
 
-    - ***Scripts***
+    - ***scripts***
         - Contains miscellaneous scripts.
 
 ## ⏩ Execution
