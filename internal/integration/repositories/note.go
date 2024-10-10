@@ -34,7 +34,8 @@ func (n *noteRepository) Get(ctx context.Context, userId string, noteId string) 
 }
 
 func (n *noteRepository) Create(ctx context.Context, note entities.Note) (*entities.Note, error) {
-	err := n.connection.WithContext(ctx).Create(&note).Error
+	var noteModel models.Note
+	err := n.connection.WithContext(ctx).Create(noteModel.FromEntity(note)).Error
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23503" {
@@ -42,7 +43,7 @@ func (n *noteRepository) Create(ctx context.Context, note entities.Note) (*entit
 		}
 		return nil, exceptions.NewInternalServerError("failed to create note", err.Error())
 	}
-	return &note, nil
+	return noteModel.ToEntity(), nil
 }
 
 func (n *noteRepository) Delete(ctx context.Context, userId, noteId string) error {

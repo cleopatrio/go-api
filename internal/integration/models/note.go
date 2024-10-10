@@ -10,13 +10,13 @@ import (
 
 // TODO arrumar entirades (json com dto no delivery) (gorm com model no integration)
 type Note struct {
-	Id        string     `gorm:"column:id;primaryKey" json:"id"`
-	Title     string     `gorm:"column:title;not null" json:"title" validate:"required,min=3"`
-	Content   string     `gorm:"column:content;not null" json:"content" validate:"required,min=3"`
-	UserId    string     `gorm:"column:user_id;not null" json:"user_id"  validate:"required"`
-	User      User       `gorm:"foreignKey:UserId" json:"-" validate:"-"`
-	CreatedAt *time.Time `gorm:"column:created_at;not null" json:"created_at"`
-	UpdatedAt *time.Time `gorm:"column:updated_at;not null" json:"updated_at"`
+	Id        string    `gorm:"column:id;primaryKey" json:"id"`
+	Title     string    `gorm:"column:title;not null" json:"title" validate:"required,min=3"`
+	Content   string    `gorm:"column:content;not null" json:"content" validate:"required,min=3"`
+	UserId    string    `gorm:"column:user_id;not null" json:"user_id"  validate:"required"`
+	User      User      `gorm:"foreignKey:UserId" json:"-" validate:"-"`
+	CreatedAt time.Time `gorm:"column:created_at;not null" json:"created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at;not null" json:"updated_at"`
 }
 
 func (Note) TableName() string {
@@ -41,9 +41,25 @@ func (n Note) ToEntity() *entities.Note {
 		Title:     n.Title,
 		Content:   n.Content,
 		UserId:    n.UserId,
-		CreatedAt: n.CreatedAt,
-		UpdatedAt: n.UpdatedAt,
+		CreatedAt: &n.CreatedAt,
+		UpdatedAt: &n.UpdatedAt,
 	}
+}
+
+func (n *Note) FromEntity(note entities.Note) *Note {
+	n.Id = note.Id
+	n.Title = note.Title
+	n.Content = note.Content
+	n.UserId = note.UserId
+
+	if note.CreatedAt != nil {
+		n.CreatedAt = *note.CreatedAt
+	}
+	if note.UpdatedAt != nil {
+		n.UpdatedAt = *note.UpdatedAt
+	}
+
+	return n
 }
 
 type Notes []*Note

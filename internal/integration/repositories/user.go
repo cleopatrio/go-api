@@ -31,23 +31,25 @@ func (u *userRepository) Get(ctx context.Context, userId string) (*entities.User
 }
 
 func (u *userRepository) Create(ctx context.Context, user entities.User) (*entities.User, error) {
-	err := u.connection.WithContext(ctx).Create(&user).Error
+	var userModel models.User
+
+	err := u.connection.WithContext(ctx).Create(userModel.FromEntity(user)).Error
 	if err != nil {
 		return nil, exceptions.NewInternalServerError("failed to create user", err.Error())
 	}
 
-	return &user, nil
+	return userModel.ToEntity(), nil
 }
 
 func (u *userRepository) Delete(ctx context.Context, userId string) error {
-	tx := u.connection.WithContext(ctx).Select(clause.Associations).Delete(&entities.User{Id: userId})
+	tx := u.connection.WithContext(ctx).Select(clause.Associations).Delete(&models.User{Id: userId})
 	err := tx.Error
 	if err != nil {
 		return exceptions.NewInternalServerError(fmt.Sprintf("failed to delete user with id %s", userId), err.Error())
 	}
 
 	if tx.RowsAffected == 0 {
-		err = exceptions.NewNotFoundError(fmt.Sprintf("user with id %s not found", userId))
+		return exceptions.NewNotFoundError(fmt.Sprintf("user with id %s not found", userId))
 	}
 
 	return nil
