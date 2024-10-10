@@ -1,9 +1,11 @@
-package entity
+package models
 
 import (
+	"time"
+
+	"github.com/dock-tech/notes-api/internal/domain/entities"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"time"
 )
 
 type User struct {
@@ -23,4 +25,23 @@ func (User) BeforeCreate(db *gorm.DB) (err error) {
 	db.Statement.SetColumn("updated_at", time.Now())
 	db.Statement.SetColumn("id", uuid.New())
 	return
+}
+
+func (u User) ToEntity() *entities.User {
+	return &entities.User{
+		Id:        u.Id,
+		Name:      u.Name,
+		CreatedAt: u.CreatedAt,
+		UpdatedAt: u.UpdatedAt,
+	}
+}
+
+type Users []*User
+
+func (u Users) ToEntities() []*entities.User {
+	users := make([]*entities.User, len(u))
+	for i, user := range u {
+		users[i] = user.ToEntity()
+	}
+	return users
 }

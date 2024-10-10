@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/dock-tech/notes-api/internal/domain/entity"
+
+	"github.com/dock-tech/notes-api/internal/domain/entities"
 	"github.com/dock-tech/notes-api/internal/domain/exceptions"
 	"github.com/dock-tech/notes-api/internal/integration/adapters"
+	"github.com/dock-tech/notes-api/internal/integration/models"
 	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/gorm"
 )
@@ -15,10 +17,10 @@ type noteRepository struct {
 	connection *gorm.DB
 }
 
-func (n *noteRepository) Get(ctx context.Context, userId string, noteId string) (*entity.Note, error) {
-	var note *entity.Note
+func (n *noteRepository) Get(ctx context.Context, userId string, noteId string) (*entities.Note, error) {
+	var note *models.Note
 	err := n.connection.WithContext(ctx).Where(
-		&entity.Note{
+		&models.Note{
 			UserId: userId,
 			Id:     noteId,
 		}).First(&note).Error
@@ -28,10 +30,10 @@ func (n *noteRepository) Get(ctx context.Context, userId string, noteId string) 
 			return nil, exceptions.NewNotFoundError(fmt.Sprintf("note with id %s not found", noteId))
 		}
 	}
-	return note, err
+	return note.ToEntity(), err
 }
 
-func (n *noteRepository) Create(ctx context.Context, note entity.Note) (*entity.Note, error) {
+func (n *noteRepository) Create(ctx context.Context, note entities.Note) (*entities.Note, error) {
 	err := n.connection.WithContext(ctx).Create(&note).Error
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -44,7 +46,7 @@ func (n *noteRepository) Create(ctx context.Context, note entity.Note) (*entity.
 }
 
 func (n *noteRepository) Delete(ctx context.Context, userId, noteId string) error {
-	tx := n.connection.WithContext(ctx).Delete(&entity.Note{Id: noteId, UserId: userId})
+	tx := n.connection.WithContext(ctx).Delete(&models.Note{Id: noteId, UserId: userId})
 	err := tx.Error
 	if err != nil {
 		return exceptions.NewInternalServerError(fmt.Sprintf("failed to delete note with id %s and userId %s", noteId, userId), err.Error())
@@ -56,13 +58,13 @@ func (n *noteRepository) Delete(ctx context.Context, userId, noteId string) erro
 	return nil
 }
 
-func (n *noteRepository) List(ctx context.Context, userId string) ([]*entity.Note, error) {
-	var notes []*entity.Note
-	err := n.connection.WithContext(ctx).Where(&entity.Note{UserId: userId}).Find(&notes).Error
+func (n *noteRepository) List(ctx context.Context, userId string) ([]*entities.Note, error) {
+	var notes models.Notes
+	err := n.connection.WithContext(ctx).Where(&models.Note{UserId: userId}).Find(&notes).Error
 	if err != nil {
 		return nil, exceptions.NewInternalServerError(fmt.Sprintf("failed to list notes from userId %s", userId), err.Error())
 	}
-	return notes, err
+	return notes.ToEntities(), err
 }
 
 func NewNote(connection *gorm.DB) adapters.NoteRepository {

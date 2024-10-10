@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/dock-tech/notes-api/internal/delivery/adapters"
-	"github.com/dock-tech/notes-api/internal/delivery/validations"
-	"github.com/dock-tech/notes-api/internal/domain/entity"
-	"github.com/dock-tech/notes-api/internal/domain/exceptions"
-	"github.com/dock-tech/notes-api/internal/domain/usecases"
 	"log/slog"
 	"net/http"
+
+	"github.com/dock-tech/notes-api/internal/delivery/adapters"
+	"github.com/dock-tech/notes-api/internal/delivery/dtos"
+	"github.com/dock-tech/notes-api/internal/delivery/validations"
+	"github.com/dock-tech/notes-api/internal/domain/exceptions"
+	"github.com/dock-tech/notes-api/internal/domain/usecases"
 )
 
 type userController struct {
@@ -36,7 +37,7 @@ func (u *userController) CreateUser(ctx context.Context, body []byte) (response 
 		slog.String("body", string(body)),
 	)
 
-	var user entity.User
+	var user dtos.User
 	err := json.Unmarshal(body, &user)
 	if err != nil {
 		err = exceptions.NewValidationError(fmt.Sprintf("error parsing json to user: %s", err.Error()))
@@ -47,14 +48,14 @@ func (u *userController) CreateUser(ctx context.Context, body []byte) (response 
 		return u.errorHandlerUsecase.HandleError(ctx, err)
 	}
 
-	createdUser, err := u.createUserUseCase.Create(ctx, user)
+	createdUser, err := u.createUserUseCase.Create(ctx, user.ToEntity())
 	if err != nil {
 		return u.errorHandlerUsecase.HandleError(ctx, err)
 	}
 
 	status = http.StatusCreated
 
-	response, err = json.Marshal(createdUser)
+	response, err = json.Marshal(user.FromEntity(createdUser))
 	if err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("error parsing user to JSON: %s", err.Error()))
 		return u.errorHandlerUsecase.HandleError(ctx, err)
@@ -104,7 +105,8 @@ func (u *userController) GetUser(ctx context.Context, id string) (response []byt
 		return u.errorHandlerUsecase.HandleError(ctx, err)
 	}
 
-	response, err = json.Marshal(user)
+	var userDTO dtos.User
+	response, err = json.Marshal(userDTO.FromEntity(user))
 	if err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("error parsing user to JSON: %s", err.Error()))
 		return u.errorHandlerUsecase.HandleError(ctx, err)
@@ -133,7 +135,8 @@ func (u *userController) ListUsers(ctx context.Context) (response []byte, status
 		return u.errorHandlerUsecase.HandleError(ctx, err)
 	}
 
-	response, err = json.Marshal(users)
+	var usersDTO dtos.Users
+	response, err = json.Marshal(usersDTO.FromEntities(users))
 	if err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("error parsing users to JSON: %s", err.Error()))
 		return u.errorHandlerUsecase.HandleError(ctx, err)

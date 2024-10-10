@@ -38,7 +38,7 @@ Users are uniquely identified by a UUID (<code>user_id</code>), and the API allo
 Upon creation, a new user with the provided attributes is stored in the system, and the service can query existing users, modify user details, or delete them. Similarly, the notes system allows for creating, reading, updating, and deleting notes attached to a specific user.
 </p>
 <p>
-Each API operation either performs a specific CRUD (Create, Read, Update, Delete) action on the user resource or the note resource, with interaction between the two based on user identity.
+Each API operation either performs a specific CRUD (Create, Read, Update, Delete) action on the user resource or the note resource, with interaction between the two based on user identities.
 </p>
 
 ## ⚙ Stack

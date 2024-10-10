@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/dock-tech/notes-api/internal/delivery/adapters"
-	"github.com/dock-tech/notes-api/internal/delivery/validations"
-	"github.com/dock-tech/notes-api/internal/domain/entity"
-	"github.com/dock-tech/notes-api/internal/domain/exceptions"
-	"github.com/dock-tech/notes-api/internal/domain/usecases"
 	"log/slog"
 	"net/http"
+
+	"github.com/dock-tech/notes-api/internal/delivery/adapters"
+	"github.com/dock-tech/notes-api/internal/delivery/dtos"
+	"github.com/dock-tech/notes-api/internal/delivery/validations"
+	"github.com/dock-tech/notes-api/internal/domain/exceptions"
+	"github.com/dock-tech/notes-api/internal/domain/usecases"
 )
 
 type notesController struct {
@@ -36,7 +37,7 @@ func (n *notesController) CreateNote(ctx context.Context, userId string, body []
 		slog.String("userId", userId),
 	)
 
-	var note entity.Note
+	var note dtos.Note
 	err := json.Unmarshal(body, &note)
 	if err != nil {
 		err = exceptions.NewValidationError(fmt.Sprintf("error parsing JSON to note: %s", err.Error()))
@@ -49,12 +50,12 @@ func (n *notesController) CreateNote(ctx context.Context, userId string, body []
 		return n.errorHandlerUsecase.HandleError(ctx, err)
 	}
 
-	createdNote, err := n.createNoteUseCase.Create(ctx, note)
+	createdNote, err := n.createNoteUseCase.Create(ctx, note.ToEntity())
 	if err != nil {
 		return n.errorHandlerUsecase.HandleError(ctx, err)
 	}
 
-	if response, err = json.Marshal(createdNote); err != nil {
+	if response, err = json.Marshal(note.FromEntity(createdNote)); err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("error parsing note to JSON: %s", err.Error()))
 		return n.errorHandlerUsecase.HandleError(ctx, err)
 	}
@@ -107,7 +108,8 @@ func (n *notesController) GetNote(ctx context.Context, userId string, noteId str
 		return n.errorHandlerUsecase.HandleError(ctx, err)
 	}
 
-	response, err = json.Marshal(note)
+	var noteDto dtos.Note
+	response, err = json.Marshal(noteDto.FromEntity(note))
 	if err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("error parsing note to JSON: %s", err.Error()))
 		return n.errorHandlerUsecase.HandleError(ctx, err)
@@ -137,7 +139,8 @@ func (n *notesController) ListNotes(ctx context.Context, userId string) (respons
 		return n.errorHandlerUsecase.HandleError(ctx, err)
 	}
 
-	response, err = json.Marshal(notes)
+	var notesDto dtos.Notes
+	response, err = json.Marshal(notesDto.FromEntities(notes))
 	if err != nil {
 		err = exceptions.NewInternalServerError(fmt.Sprintf("error parsing notes to JSON: %s", err.Error()))
 		return n.errorHandlerUsecase.HandleError(ctx, err)

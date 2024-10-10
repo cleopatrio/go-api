@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/dock-tech/notes-api/internal/domain/entity"
+
+	"github.com/dock-tech/notes-api/internal/domain/entities"
 	"github.com/dock-tech/notes-api/internal/domain/exceptions"
 	"github.com/dock-tech/notes-api/internal/integration/adapters"
+	"github.com/dock-tech/notes-api/internal/integration/models"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -15,20 +17,20 @@ type userRepository struct {
 	connection *gorm.DB
 }
 
-func (u *userRepository) Get(ctx context.Context, userId string) (*entity.User, error) {
-	var user *entity.User
+func (u *userRepository) Get(ctx context.Context, userId string) (*entities.User, error) {
+	var user *models.User
 	err := u.connection.WithContext(ctx).Where(
-		&entity.User{
+		&entities.User{
 			Id: userId,
 		}).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, exceptions.NewNotFoundError(fmt.Sprintf("user with id %s not found", userId))
 	}
 
-	return user, nil
+	return user.ToEntity(), nil
 }
 
-func (u *userRepository) Create(ctx context.Context, user entity.User) (*entity.User, error) {
+func (u *userRepository) Create(ctx context.Context, user entities.User) (*entities.User, error) {
 	err := u.connection.WithContext(ctx).Create(&user).Error
 	if err != nil {
 		return nil, exceptions.NewInternalServerError("failed to create user", err.Error())
@@ -38,7 +40,7 @@ func (u *userRepository) Create(ctx context.Context, user entity.User) (*entity.
 }
 
 func (u *userRepository) Delete(ctx context.Context, userId string) error {
-	tx := u.connection.WithContext(ctx).Select(clause.Associations).Delete(&entity.User{Id: userId})
+	tx := u.connection.WithContext(ctx).Select(clause.Associations).Delete(&entities.User{Id: userId})
 	err := tx.Error
 	if err != nil {
 		return exceptions.NewInternalServerError(fmt.Sprintf("failed to delete user with id %s", userId), err.Error())
@@ -51,14 +53,14 @@ func (u *userRepository) Delete(ctx context.Context, userId string) error {
 	return nil
 }
 
-func (u *userRepository) List(ctx context.Context) ([]*entity.User, error) {
-	var users []*entity.User
+func (u *userRepository) List(ctx context.Context) ([]*entities.User, error) {
+	var users models.Users
 	err := u.connection.WithContext(ctx).Find(&users).Error
 	if err != nil {
 		return nil, exceptions.NewInternalServerError("failed to list users", err.Error())
 	}
 
-	return users, nil
+	return users.ToEntities(), nil
 }
 
 func NewUser(connection *gorm.DB) adapters.UserRepository {

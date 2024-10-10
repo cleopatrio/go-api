@@ -2,9 +2,9 @@ package usecases
 
 import (
 	"context"
-	"github.com/dock-tech/notes-api/internal/domain/entity"
+	"github.com/dock-tech/notes-api/internal/domain/entities"
 )
 
 type ListUsersUseCase interface {
-	List(ctx context.Context) (users []*entity.User, err error)
+	List(ctx context.Context) (users []*entities.User, err error)
 }
