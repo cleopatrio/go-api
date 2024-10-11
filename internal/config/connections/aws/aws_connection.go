@@ -2,12 +2,14 @@ package aws
 
 import (
 	"context"
+	"os"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/dock-tech/notes-api/internal/config/properties"
 	"github.com/dock-tech/notes-api/internal/integration/secrets"
-	"os"
 )
 
 func NewAws() aws.Config {
@@ -30,4 +32,13 @@ func NewAwsSecretsManager(cfg aws.Config) secrets.SecretClient {
 	return secretsmanager.NewFromConfig(cfg)
 }
 
-//TODO: create sqs connection
+func NewAwsSqs(cfg aws.Config) *sqs.Client {
+	if awsUrl := os.Getenv("AWS_URL"); awsUrl != "" {
+		println("Using AWS_URL: ", awsUrl)
+		return sqs.NewFromConfig(cfg, func(o *sqs.Options) {
+			o.BaseEndpoint = &awsUrl
+		})
+	}
+
+	return sqs.NewFromConfig(cfg)
+}

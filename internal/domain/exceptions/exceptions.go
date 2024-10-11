@@ -25,3 +25,11 @@ func NewNotFoundError(messages ...string) *ErrorType {
 		Type:       "Not Found Error",
 	}
 }
+
+func NewNotesQueueError(messages ...string) *ErrorType {
+	return &ErrorType{
+		StatusCode: http.StatusInternalServerError,
+		Messages:   messages,
+		Type:       "Notes queue error",
+	}
+}
