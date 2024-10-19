@@ -14,9 +14,13 @@ build-local:
 run:
 	go run ./cmd/server/main.go
 
+mocks:
+	go install go.uber.org/mock/mockgen@latest
+	mockgen -source=internal/domain/adapters/create_note_repository_adapter.go -destination=test/mocks/create_note_repository_adapter_mock.go -package=mocks
+	mockgen -source=internal/domain/adapters/note_queue_adapter.go -destination=test/mocks/note_queue_adapter_mock.go -package=mocks
+
 tests:
-	go test -v ./test/integration/...
-	go test -v ./test/unit/...
+	go test -v ./test/...
 
 docker-up:
 	./scripts/docker-up.sh
