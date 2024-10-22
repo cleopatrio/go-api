@@ -11,21 +11,46 @@ import (
 	"github.com/dock-tech/notes-api/internal/integration/queues"
 	"github.com/dock-tech/notes-api/internal/integration/repositories"
 	"github.com/dock-tech/notes-api/internal/integration/secrets"
+	"gorm.io/gorm"
+	"sync"
 )
 
-// TODO injetar sqs apos criacao
-func InitializeServer() (adapters.Server, error) {
-	cacheClientSet := database.NewCacheGet()
-	cacheClientGet := database.NewCacheSet()
-	cache := caches.NewCache(cacheClientSet, cacheClientGet)
+type wire struct {
+	Db  *gorm.DB
+	Sqs queues.SqsClient
+}
+
+var wireInit sync.Once
+var wireInstance *wire
+
+func Wire() *wire {
+	if wireInstance == nil {
+		wireInit.Do(
+			func() {
+				wireInstance = &wire{}
+			},
+		)
+	}
+
+	return wireInstance
+}
+
+func (w *wire) InitializeServer() (adapters.Server, error) {
 	config := aws.NewAws()
-	secretClient := aws.NewAwsSecretsManager(config)
-	secret := secrets.NewSecret(secretClient)
-	sqsClient := aws.NewAwsSqs(config)
-	notesQueue := queues.NewNotesQueue(sqsClient)
-	db := database.NewDb(cache, secret)
-	notesRepository := repositories.NewNote(db)
-	usersRepository := repositories.NewUser(db)
+	if w.Db == nil {
+		cacheClientSet := database.NewCacheSet()
+		cacheClientGet := database.NewCacheGet()
+		cache := caches.NewCache(cacheClientGet, cacheClientSet)
+		secretClient := aws.NewAwsSecretsManager(config)
+		secret := secrets.NewSecret(secretClient)
+		w.Db = database.NewDb(cache, secret)
+	}
+	notesRepository := repositories.NewNote(w.Db)
+	usersRepository := repositories.NewUser(w.Db)
+	if w.Sqs == nil {
+		w.Sqs = aws.NewAwsSqs(config)
+	}
+	notesQueue := queues.NewNotesQueue(w.Sqs)
 	errorHandler := controllers.NewErrorHandler()
 	usersController := controllers.NewUsersController(
 		usecases.CreateUserUseCase(usersRepository),

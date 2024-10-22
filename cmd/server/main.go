@@ -13,7 +13,7 @@ func main() {
 			panic(err)
 		}
 	}
-	server, err := injections.InitializeServer()
+	server, err := injections.Wire().InitializeServer()
 	if err != nil {
 		panic(err)
 	}

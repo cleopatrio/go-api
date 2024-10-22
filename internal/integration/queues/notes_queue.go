@@ -3,7 +3,6 @@ package queues
 import (
 	"context"
 	"encoding/json"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/dock-tech/notes-api/internal/config/properties"
@@ -13,15 +12,13 @@ import (
 	"github.com/dock-tech/notes-api/internal/domain/exceptions"
 )
 
-type (
-	SqsClient interface {
-		SendMessage(ctx context.Context, params *sqs.SendMessageInput, optFns ...func(*sqs.Options)) (*sqs.SendMessageOutput, error)
-	}
+type SqsClient interface {
+	SendMessage(ctx context.Context, params *sqs.SendMessageInput, optFns ...func(*sqs.Options)) (*sqs.SendMessageOutput, error)
+}
 
-	notes struct {
-		sqsClient SqsClient
-	}
-)
+type notes struct {
+	sqsClient SqsClient
+}
 
 func (n *notes) Publish(ctx context.Context, note entities.Note) (err error) {
 	var noteDTO dtos.Note

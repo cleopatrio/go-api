@@ -8,9 +8,8 @@ import (
 
 const (
 	ApplicationRepositoryName = "go-api"
-
-	CacheDbSecretKey = "_DB_SECRET"
-	CacheExpiration  = time.Hour * 24 * 16
+	CacheDbSecretKey          = "_DB_SECRET"
+	CacheExpiration           = time.Hour * 24 * 16
 )
 
 func GetNotesQueueURL() string {
