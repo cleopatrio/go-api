@@ -37,4 +37,4 @@ install-gremlins:
 	go install github.com/go-gremlins/gremlins/cmd/gremlins@main
 
 mutant-test:
-	gremlins unleash --integration --exclude-files "test/mock/..."
+	gremlins unleash --config=gremlins.yaml --exclude-files "test/mock/..." --exclude-files "test/mocks/..."
