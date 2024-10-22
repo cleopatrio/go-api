@@ -24,7 +24,7 @@ mocks:
 tests:
 	go test -v ./test/...
 
-test-bdd:
+bdd:
 	go test -v ./test/integration/... --scenarios=$(scenarios)
 
 docker-up:
