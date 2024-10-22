@@ -344,12 +344,12 @@ func (t *testUtils) theDbShouldContainTheWithTheColumnColumEqualTo(
 		}
 	}
 	if entityName == "note" {
-		entity = &models.User{}
+		entity = &models.Note{}
 
 		var result *gorm.DB
 		switch key {
-		case "user_id":
-			result = t.db.Where("user_id = ?", keyValue).First(entity)
+		case "title":
+			result = t.db.Where("title = ?", keyValue).First(entity)
 		default:
 			return errors.New("unknown key")
 		}
@@ -359,7 +359,17 @@ func (t *testUtils) theDbShouldContainTheWithTheColumnColumEqualTo(
 		}
 	}
 
-	field := getFieldValue(entity, dotSeparatedField)
+	entityJson, err := json.Marshal(entity)
+	if err != nil {
+		return err
+	}
+
+	var entityMap map[string]any
+	if err := json.Unmarshal(entityJson, &entityMap); err != nil {
+		return err
+	}
+
+	field := getFieldValue(entityMap, dotSeparatedField)
 
 	if value == "nil" {
 		return assertNull(field)
@@ -407,8 +417,8 @@ func (t *testUtils) theDbShouldContainObjectsInTheTable(
 	quantity int,
 	entityName string,
 ) error {
-	if entityName == "user" {
-		var entity []*models.Users
+	if entityName == "users" {
+		var entity []*models.User
 		result := t.db.Find(&entity)
 		if result.Error != nil {
 			return result.Error
@@ -416,8 +426,8 @@ func (t *testUtils) theDbShouldContainObjectsInTheTable(
 
 		return assertEqual(len(entity), quantity)
 	}
-	if entityName == "note" {
-		var entity []*models.Notes
+	if entityName == "notes" {
+		var entity []*models.Note
 		result := t.db.Find(&entity)
 		if result.Error != nil {
 			return result.Error

@@ -54,3 +54,23 @@ Feature: Create note
     And the response should contain the field "id" equal to "not nil"
     And the response should contain the field "title" equal to "My first note"
     And the response should contain the field "content" equal to "This is my first note"
+
+  Scenario: Create note success - db fields validation
+    Given the db should contain 0 objects in the "notes" table
+    And the "user" exists
+    """
+    {
+      "id": "90d78048-f39d-47ab-9d24-3da4d8d1fb23",
+      "name": "John Doe"
+    }
+    """
+    When I call "POST" "/v1/users/90d78048-f39d-47ab-9d24-3da4d8d1fb23/notes" with body
+    """
+    {
+       "title": "My first note",
+       "content": "This is my first note"
+    }
+    """
+    Then the status returned should be 201
+    And the db should contain 1 objects in the "notes" table
+    And the db should contain the "note" with the "title" column value "My first note" colum "content" equal to "This is my first note"

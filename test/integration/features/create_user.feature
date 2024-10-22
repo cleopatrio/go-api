@@ -33,3 +33,16 @@ Feature: Create user
     Then the status returned should be 201
     And the response should contain the field "name" equal to "John Doe"
     And the response should contain the field "id" equal to "not nil"
+
+  Scenario: Create user success - db fields validation
+    Given the header is empty
+    And the db should contain 0 objects in the "users" table
+    When I call "POST" "/v1/users" with body
+    """
+    {
+      "name": "John Doe"
+    }
+    """
+    Then the status returned should be 201
+    And the db should contain 1 objects in the "users" table
+    And the db should contain the "user" with the "name" column value "John Doe" colum "id" equal to "not nil"
