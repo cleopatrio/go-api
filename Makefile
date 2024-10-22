@@ -3,6 +3,8 @@ ARCH=amd64
 GO111MODULE=on
 GOENV=GOOS=${OS} GOARCH=${ARCH}
 
+scenarios=all
+
 install:
 	go mod download -x
 	go mod tidy
@@ -21,6 +23,9 @@ mocks:
 
 tests:
 	go test -v ./test/...
+
+test-bdd:
+	go test -v ./test/integration/... --scenarios=$(scenarios)
 
 docker-up:
 	./scripts/docker-up.sh
