@@ -8,6 +8,7 @@ import (
 	"github.com/dock-tech/notes-api/internal/delivery/servers"
 	"github.com/dock-tech/notes-api/internal/domain/usecases"
 	"github.com/dock-tech/notes-api/internal/integration/caches"
+	"github.com/dock-tech/notes-api/internal/integration/queues"
 	"github.com/dock-tech/notes-api/internal/integration/repositories"
 	"github.com/dock-tech/notes-api/internal/integration/secrets"
 )
@@ -20,6 +21,8 @@ func InitializeServer() (adapters.Server, error) {
 	config := aws.NewAws()
 	secretClient := aws.NewAwsSecretsManager(config)
 	secret := secrets.NewSecret(secretClient)
+	sqsClient := aws.NewAwsSqs(config)
+	notesQueue := queues.NewNotesQueue(sqsClient)
 	db := database.NewDb(cache, secret)
 	notesRepository := repositories.NewNote(db)
 	usersRepository := repositories.NewUser(db)
@@ -32,7 +35,7 @@ func InitializeServer() (adapters.Server, error) {
 		errorHandler,
 	)
 	notesController := controllers.NewNotesController(
-		usecases.CreateNoteUseCase(notesRepository),
+		*usecases.NewCreateNoteUseCase(notesRepository, notesQueue),
 		usecases.DeleteNoteUseCase(notesRepository),
 		usecases.GetNoteUseCase(notesRepository),
 		usecases.ListNotesUseCase(notesRepository),

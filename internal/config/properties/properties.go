@@ -13,6 +13,10 @@ const (
 	CacheExpiration  = time.Hour * 24 * 16
 )
 
+func GetNotesQueueURL() string {
+	return os.Getenv("NOTES_QUEUE_URL")
+}
+
 func GetDatabaseSslMode() string {
 	return os.Getenv("DATABASE_SSL_MODE")
 }
