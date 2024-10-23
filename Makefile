@@ -33,9 +33,6 @@ docker-up:
 docker-down:
 	./scripts/docker-down.sh
 
-install-gremlins:
-	go install github.com/go-gremlins/gremlins/cmd/gremlins@main
-
 mutant-test:
 	go get github.com/go-gremlins/gremlins/cmd/gremlins
 	go install github.com/go-gremlins/gremlins/cmd/gremlins
