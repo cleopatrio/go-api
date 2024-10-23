@@ -17,9 +17,11 @@ run:
 	go run ./cmd/server/main.go
 
 mocks:
-	go install go.uber.org/mock/mockgen@latest
+	go install go.uber.org/mock/mockgen
 	mockgen -source=internal/domain/adapters/create_note_repository_adapter.go -destination=test/mocks/create_note_repository_adapter_mock.go -package=mocks
-	mockgen -source=internal/domain/adapters/note_queue_adapter.go -destination=test/mocks/note_queue_adapter_mock.go -package=mocks
+	mockgen -source=internal/domain/adapters/create_note_repository_adapter.go -destination=test/mocks/create_note_repository_adapter_mock.go -package=mocks
+	mockgen -source=internal/integration/queues/notes_queue.go -destination=test/mocks/notes_queue_mock.go -package=mocks
+
 
 tests:
 	go test -v ./test/...

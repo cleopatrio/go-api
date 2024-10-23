@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -10,12 +11,13 @@ import (
 	"github.com/dock-tech/notes-api/internal/domain/usecases"
 	"github.com/dock-tech/notes-api/test/mocks"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
 
-func BenchmarkCreateNote(b *testing.B) {
+func TestCreateNote(t *testing.T) {
 	var (
-		ctrl             = gomock.NewController(b)
+		ctrl             = gomock.NewController(t)
 		noteQueueMocked  = mocks.NewMockNoteQueue(ctrl)
 		createNoteMocked = mocks.NewMockCreateNoteRepository(ctrl)
 		createNote       = usecases.NewCreateNoteUseCase(createNoteMocked, noteQueueMocked)
@@ -33,13 +35,41 @@ func BenchmarkCreateNote(b *testing.B) {
 		}
 	)
 
-	b.Run("CreateNote", func(b *testing.B) {
-		createNoteMocked.EXPECT().Create(ctx, noteEntity).Return(&expectedCreatedNote, nil).AnyTimes()
-		noteQueueMocked.EXPECT().Publish(ctx, expectedCreatedNote).AnyTimes()
+	t.Run("should CreateNote with success", func(t *testing.T) {
+		t.Cleanup(ctrl.Finish)
 
-		for i := 0; i < b.N; i++ {
-			_, _ = createNote.Create(ctx, noteEntity)
-		}
+			createNoteMocked.EXPECT().Create(ctx, noteEntity).Return(&expectedCreatedNote, nil).Times(1)
+		noteQueueMocked.EXPECT().Publish(ctx, expectedCreatedNote).Return(nil).Times(1)
+
+		createdNote, err := createNote.Create(ctx, noteEntity)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, createdNote)
+		assert.Equal(t, expectedCreatedNote, *createdNote)
+	})
+
+	t.Run("should return an error when noteQueue returns an error", func(t *testing.T) {
+		t.Cleanup(ctrl.Finish)
+
+		expectedErr := errors.New(uuid.NewString())
+		createNoteMocked.EXPECT().Create(ctx, noteEntity).Return(&expectedCreatedNote, nil).Times(1)
+		noteQueueMocked.EXPECT().Publish(ctx, expectedCreatedNote).Return(expectedErr).Times(1)
+
+		_, err := createNote.Create(ctx, noteEntity)
+
+		assert.Equal(t, expectedErr, err)
+	})
+
+	t.Run("should return an error when createNote returns an error", func(t *testing.T) {
+		t.Cleanup(ctrl.Finish)
+
+		expectedErr := errors.New(uuid.NewString())
+		createNoteMocked.EXPECT().Create(ctx, noteEntity).Return(nil, expectedErr).Times(1)
+		noteQueueMocked.EXPECT().Publish(gomock.Any(), gomock.Any()).Times(0)
+
+		_, err := createNote.Create(ctx, noteEntity)
+
+		assert.Equal(t, expectedErr, err)
 	})
 
 }
