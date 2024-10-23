@@ -36,9 +36,8 @@ func TestCreateNote(t *testing.T) {
 	)
 
 	t.Run("should CreateNote with success", func(t *testing.T) {
-		t.Cleanup(ctrl.Finish)
 
-			createNoteMocked.EXPECT().Create(ctx, noteEntity).Return(&expectedCreatedNote, nil).Times(1)
+		createNoteMocked.EXPECT().Create(ctx, noteEntity).Return(&expectedCreatedNote, nil).Times(1)
 		noteQueueMocked.EXPECT().Publish(ctx, expectedCreatedNote).Return(nil).Times(1)
 
 		createdNote, err := createNote.Create(ctx, noteEntity)
@@ -61,7 +60,6 @@ func TestCreateNote(t *testing.T) {
 	})
 
 	t.Run("should return an error when createNote returns an error", func(t *testing.T) {
-		t.Cleanup(ctrl.Finish)
 
 		expectedErr := errors.New(uuid.NewString())
 		createNoteMocked.EXPECT().Create(ctx, noteEntity).Return(nil, expectedErr).Times(1)

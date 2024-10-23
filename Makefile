@@ -39,3 +39,6 @@ mutant-test:
 	go get github.com/go-gremlins/gremlins/cmd/gremlins
 	go install github.com/go-gremlins/gremlins/cmd/gremlins
 	gremlins unleash --config=gremlins.yaml --exclude-files "test/mock/..." --exclude-files "test/mocks/..."
+
+bench:
+	go test -v ./test/benchmark/... -bench .  -benchmem -run=^# -count=10 | tee benchmark.txt
