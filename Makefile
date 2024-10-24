@@ -46,5 +46,11 @@ bench-test:
 fuzzy-test:
 	go test -fuzz= 
 
-bench-profile:
-	go test -v ./test/benchmark/... -bench .  -benchmem -count=10 -memprofile mem.out -cpuprofile cpu.out -o benchmark-profile.out 
+queues-benchmark-profile:
+	go test -v ./test/benchmark/internal/integration/queues/... -bench .  -benchmem -count=10 -memprofile queues-benchmark-mem.out -cpuprofile queues-benchmark-cpu.out -o queues-benchmark-profile.out  
+
+queues-benchmark-mem-pprof:
+	go tool pprof -http=:8080 queues-benchmark-mem.out 
+
+queues-benchmark-cpu-pprof:
+	go tool pprof -http=:8080 queues-benchmark-cpu.out 
