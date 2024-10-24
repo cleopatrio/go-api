@@ -24,7 +24,10 @@ type notes struct {
 func (n *notes) Publish(ctx context.Context, note entities.Note) (err error) {
 	var noteDTO dtos.Note
 
-	bytes, _ := json.Marshal(noteDTO.FromEntity(&note))
+	bytes, err := json.Marshal(noteDTO.FromEntity(&note))
+	if err != nil {
+		return exceptions.NewNotesQueueError(err.Error())
+	}
 
 	_, err = n.sqsClient.SendMessage(ctx, &sqs.SendMessageInput{
 		MessageBody: aws.String(string(bytes)),

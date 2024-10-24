@@ -23,10 +23,10 @@ mocks:
 	mockgen -source=internal/integration/queues/notes_queue.go -destination=test/mocks/notes_queue_mock.go -package=mocks
 
 
-tests:
-	go test -v ./test/...
+unit-test:
+	go test -v ./test/unit/...
 
-bdd:
+bdd-test:
 	go test -v ./test/integration/... --scenarios=$(scenarios)
 
 docker-up:
@@ -40,5 +40,11 @@ mutant-test:
 	go install github.com/go-gremlins/gremlins/cmd/gremlins
 	gremlins unleash --config=gremlins.yaml --exclude-files "test/mock/..." --exclude-files "test/mocks/..."
 
-bench:
-	go test -v ./test/benchmark/... -bench .  -benchmem -run=^# -count=10 | tee benchmark.txt
+bench-test:
+	go test -v ./test/benchmark/... -bench .  -benchmem -count=10 | tee benchmark.txt
+
+fuzzy-test:
+	go test -fuzz= 
+
+bench-profile:
+	go test -v ./test/benchmark/... -bench .  -benchmem -count=10 -memprofile mem.out -cpuprofile cpu.out -o benchmark-profile.out 
