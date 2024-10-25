@@ -39,7 +39,7 @@ func TestNotesQueue_Publish(t *testing.T) {
 			QueueUrl:    aws.String(properties.GetNotesQueueURL()),
 		}
 
-		mockSqsClient.EXPECT().SendMessage(ctx, gomock.Eq(expectedInput)).Return(&sqs.SendMessageOutput{}, nil)
+		mockSqsClient.EXPECT().SendMessage(ctx, expectedInput).Return(&sqs.SendMessageOutput{}, nil)
 
 		err := noteQueue.Publish(ctx, note)
 

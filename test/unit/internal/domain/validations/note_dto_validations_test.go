@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNoteValidationWithErrors(t *testing.T) {
+func TestNoteValidation(t *testing.T) {
 
 	tests := []struct {
 		name    string
