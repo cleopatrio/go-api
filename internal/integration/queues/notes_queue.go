@@ -29,12 +29,10 @@ func (n *notes) Publish(ctx context.Context, note entities.Note) (err error) {
 		return exceptions.NewNotesQueueError(err.Error())
 	}
 
-	_, err = n.sqsClient.SendMessage(ctx, &sqs.SendMessageInput{
+	if _, err = n.sqsClient.SendMessage(ctx, &sqs.SendMessageInput{
 		MessageBody: aws.String(string(bytes)),
 		QueueUrl:    aws.String(properties.GetNotesQueueURL()),
-	})
-
-	if err != nil {
+	}); err != nil {
 		return exceptions.NewNotesQueueError(err.Error())
 	}
 
