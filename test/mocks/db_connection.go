@@ -1,4 +1,4 @@
-package mock
+package mocks
 
 import (
 	"github.com/dock-tech/notes-api/internal/integration/models"

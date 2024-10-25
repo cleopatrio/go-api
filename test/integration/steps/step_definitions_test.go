@@ -9,7 +9,7 @@ import (
 	"github.com/cucumber/godog"
 	injections "github.com/dock-tech/notes-api/internal/config/injections/server"
 	"github.com/dock-tech/notes-api/internal/integration/models"
-	"github.com/dock-tech/notes-api/test/mock"
+	"github.com/dock-tech/notes-api/test/mocks"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
@@ -55,7 +55,7 @@ type testUtils struct {
 	response *response
 	db       *gorm.DB
 	redis    *redis.Client
-	sqs      *mock.SqsClient
+	sqs      *mocks.SqsClient
 }
 
 type response struct {
@@ -69,8 +69,8 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	test := &testUtils{
 		uri:    "http://localhost:" + os.Getenv("SERVER_PORT"),
 		client: &http.Client{},
-		db:     mock.Db(),
-		sqs:    mock.NewSqsMock(),
+		db:     mocks.Db(),
+		sqs:    mocks.Sqs(),
 	}
 	injections.Wire().Db = test.db
 	injections.Wire().Sqs = test.sqs
@@ -158,9 +158,9 @@ func (t *testUtils) reset() {
 	t.headers = make(map[string]string)
 	t.sqs.Reset()
 
-	err := mock.ClearDB(t.db)
+	err := mocks.ClearDB(t.db)
 	for err != nil {
-		err = mock.ClearDB(t.db)
+		err = mocks.ClearDB(t.db)
 	}
 
 	//err = mock.ClearRedis(t.redis)

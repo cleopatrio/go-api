@@ -1,4 +1,4 @@
-package mock
+package mocks
 
 import (
 	"context"
@@ -14,7 +14,7 @@ type SqsClient struct {
 
 var sqsMockInstance *SqsClient
 
-func NewSqsMock() *SqsClient {
+func Sqs() *SqsClient {
 	if sqsMockInstance == nil {
 		sqsMockInstance = &SqsClient{
 			messages: make(map[string][]*sqs.SendMessageInput),
