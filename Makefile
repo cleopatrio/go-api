@@ -26,8 +26,20 @@ mocks:
 unit-test:
 	go test -v ./test/unit/...
 
+unit-test-coverage:
+	go test ./test/unit/... -covermode=count -coverpkg=./internal/...,./cmd/...,./pkg/... -coverprofile ./coverage.out
+	go tool cover -html ./coverage.out
+
 bdd-test:
 	go test -v ./test/integration/... --scenarios=$(scenarios)
+
+bdd-test-coverage:
+	go test ./test/integration/... -covermode=count -coverpkg=./internal/...,./cmd/...,./pkg/... -coverprofile ./coverage.out
+	go tool cover -html ./coverage.out
+
+test-coverage:
+	go test ./test/integration... ./test/unit... -covermode=count -coverpkg=./internal/...,./cmd/...,./pkg/... -coverprofile ./coverage.out
+	go tool cover -html ./coverage.out
 
 docker-up:
 	./scripts/docker-up.sh
@@ -44,7 +56,7 @@ bench-test:
 	go test -v ./test/benchmark/... -bench .  -benchmem -count=10 | tee benchmark.txt
 
 fuzzy-test:
-	go test -fuzz= 
+	go test -v ./test/fuzzy/...  -fuzz=. -fuzztime 10s
 
 queues-benchmark-profile:
 	go test -v ./test/benchmark/internal/integration/queues/... -bench .  -benchmem -count=10 -memprofile queues-benchmark-mem.out -cpuprofile queues-benchmark-cpu.out -o queues-benchmark-profile.out  

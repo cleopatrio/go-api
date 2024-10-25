@@ -48,7 +48,6 @@ func TestCreateNote(t *testing.T) {
 	})
 
 	t.Run("should return an error when noteQueue returns an error", func(t *testing.T) {
-		t.Cleanup(ctrl.Finish)
 
 		expectedErr := errors.New(uuid.NewString())
 		createNoteMocked.EXPECT().Create(ctx, noteEntity).Return(&expectedCreatedNote, nil).Times(1)

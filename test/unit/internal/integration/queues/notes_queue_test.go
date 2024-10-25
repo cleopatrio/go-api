@@ -60,8 +60,6 @@ func TestNotesQueue_Publish(t *testing.T) {
 
 		err := noteQueue.Publish(ctx, note)
 
-		assert.Error(t, err)
-		assert.IsType(t, exceptions.NewNotesQueueError(), err)
-		assert.Contains(t, err.Error(), "failed to publish")
+		assert.Equal(t, exceptions.NewNotesQueueError(queueError.Error()), err)
 	})
 }
