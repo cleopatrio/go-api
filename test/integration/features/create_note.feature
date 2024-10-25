@@ -75,7 +75,6 @@ Feature: Create note
     And the db should contain 1 objects in the "notes" table
     And the db should contain the "note" with the "title" column value "My first note" colum "content" equal to "This is my first note"
 
-    @test
   Scenario: Create note success - sqs fields validation
     Given the db should contain 0 objects in the "notes" table
     And the "user" exists

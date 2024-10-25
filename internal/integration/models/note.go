@@ -1,10 +1,10 @@
 package models
 
 import (
+	"github.com/google/uuid"
 	"time"
 
 	"github.com/dock-tech/notes-api/internal/domain/entities"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -22,10 +22,13 @@ func (Note) TableName() string {
 	return "notes"
 }
 
-func (Note) BeforeCreate(db *gorm.DB) (err error) {
+func (n *Note) BeforeCreate(db *gorm.DB) (err error) {
 	db.Statement.SetColumn("created_at", time.Now())
 	db.Statement.SetColumn("updated_at", time.Now())
-	db.Statement.SetColumn("id", uuid.New())
+	if n.Id == "" {
+		db.Statement.SetColumn("id", uuid.New())
+	}
+
 	return
 }
 
