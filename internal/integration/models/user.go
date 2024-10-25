@@ -20,10 +20,12 @@ func (User) TableName() string {
 	return "users"
 }
 
-func (User) BeforeCreate(db *gorm.DB) (err error) {
-	db.Statement.SetColumn("created_at", time.Now())
-	db.Statement.SetColumn("updated_at", time.Now())
-	db.Statement.SetColumn("id", uuid.New())
+func (u *User) BeforeCreate(db *gorm.DB) (err error) {
+	u.CreatedAt = time.Now()
+	u.UpdatedAt = time.Now()
+	if u.Id == "" {
+		u.Id = uuid.New().String()
+	}
 	return
 }
 
