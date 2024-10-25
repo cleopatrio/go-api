@@ -2,33 +2,24 @@ package main
 
 import (
 	"testing"
-	"time"
 
+	"github.com/dock-tech/notes-api/internal/delivery/dtos"
 	"github.com/dock-tech/notes-api/internal/delivery/validations"
 	"github.com/dock-tech/notes-api/internal/domain/exceptions"
 	"github.com/stretchr/testify/assert"
 )
 
-type Note struct {
-	Id        string     `json:"id"`
-	Title     string     `json:"title" validate:"required,min=3"`
-	Content   string     `json:"content" validate:"required,min=3"`
-	UserId    string     `json:"user_id" validate:"required"`
-	CreatedAt *time.Time `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
-}
-
 func TestNoteValidationWithErrors(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		note    Note
+		note    dtos.Note
 		wantErr bool
 		err     error
 	}{
 		{
 			name: "valid note",
-			note: Note{
+			note: dtos.Note{
 				Id:      "1",
 				Title:   "Valid Title",
 				Content: "Valid Content",
@@ -39,7 +30,7 @@ func TestNoteValidationWithErrors(t *testing.T) {
 		},
 		{
 			name: "missing title",
-			note: Note{
+			note: dtos.Note{
 				Id:      "2",
 				Content: "Valid Content",
 				UserId:  "user123",
@@ -49,7 +40,7 @@ func TestNoteValidationWithErrors(t *testing.T) {
 		},
 		{
 			name: "short title",
-			note: Note{
+			note: dtos.Note{
 				Id:      "3",
 				Title:   "Hi",
 				Content: "Valid Content",
@@ -60,7 +51,7 @@ func TestNoteValidationWithErrors(t *testing.T) {
 		},
 		{
 			name: "missing content",
-			note: Note{
+			note: dtos.Note{
 				Id:     "4",
 				Title:  "Valid Title",
 				UserId: "user123",
@@ -70,7 +61,7 @@ func TestNoteValidationWithErrors(t *testing.T) {
 		},
 		{
 			name: "missing user_id",
-			note: Note{
+			note: dtos.Note{
 				Id:      "5",
 				Title:   "Valid Title",
 				Content: "Valid Content",
