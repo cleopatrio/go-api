@@ -23,12 +23,11 @@ func (Note) TableName() string {
 }
 
 func (n *Note) BeforeCreate(db *gorm.DB) (err error) {
-	db.Statement.SetColumn("created_at", time.Now())
-	db.Statement.SetColumn("updated_at", time.Now())
+	n.CreatedAt = time.Now()
+	n.UpdatedAt = time.Now()
 	if n.Id == "" {
-		db.Statement.SetColumn("id", uuid.New())
+		n.Id = uuid.New().String()
 	}
-
 	return
 }
 
