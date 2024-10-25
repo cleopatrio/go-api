@@ -458,7 +458,7 @@ func (t *testUtils) theDbShouldContainTheWithTheColumEqualToForTheFollowingWhere
 }
 
 func (t *testUtils) theSqsQueueShouldHaveMessagesPublished(queue string, quantity int) error {
-	err := assertEqual(t.sqs.GetMessages(queue), quantity)
+	err := assertEqual(len(t.sqs.GetMessages(queue)), quantity)
 	if err != nil {
 		return err
 	}
